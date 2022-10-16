@@ -11,42 +11,72 @@ import java.io.IOException;
  *  Reads commit hashes from DPMiner-produced PATCH file.
  */
 public class CommitHashReader {
-    final int COMMIT_HASH_COLUMN = 2;
-    final int FIX_DATE_COLUMN = 4;
+    private static final String PROJECT_SPLIT_PATTERN = "PATCH_|\\.";
+    private static final String FIX_DATE_PATTERN = 
+            "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
+    private static final int PROJECT_NAME_INDEX = 1;
+    
+    private BufferedReader in;
+    private String project;
+
+    /**
+     * The name and content of the file should follow the DPMiner-produced PATCH file format.
+     * @param fileName file name
+     * @throws FileNotFoundException
+     */
+    public CommitHashReader(String fileName) throws FileNotFoundException {
+        in = new BufferedReader(new FileReader(fileName));
+        project = fileName.split(PROJECT_SPLIT_PATTERN)[PROJECT_NAME_INDEX];   
+    }
 
     /**
      * Reads commit hashes from <code>startDate</code>(inclusive) to <code>endDate</code>(exclusive).
      * Duplicate hashes are removed.
-     * The file should follow DPMiner-produced PATCH file format.
-     * @param fileName filename to read
-     * @param startDate start date 
-     * @param endDate end date
+     * @param startDate YYYY-MM-DD format of start date 
+     * @param endDate YYYY-MM-DD format of end date 
      * @return BFC hashes
+     * @throws IOException
      */
-    public ArrayList<String> read(String fileName, String startDate, String endDate) {     
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            ArrayList<String> hashes = new ArrayList<>();
-            String line = reader.readLine();
+    public ArrayList<String> readCommitHashes(String startDate, String endDate)
+            throws IOException {     
+        ArrayList<String> hashes = new ArrayList<>();
+        
+        while (true) {
+            String line = null;
+            String hash = null, fixDate = null;
+         
+            while ((line = in.readLine()) != null) {
+                String[] splitted = line.split(",");
             
-            while ((line = reader.readLine()) != null) {
-                String[] splited = line.split(",");
-
-                if (startDate.compareTo(splited[FIX_DATE_COLUMN - 1]) <= 0 
-                        && endDate.compareTo(splited[FIX_DATE_COLUMN - 1]) > 0
-                        && hashes.size() != 0 
-                        && !hashes.get(hashes.size() - 1)
-                                  .equals(splited[COMMIT_HASH_COLUMN - 1]))
-                    hashes.add(splited[COMMIT_HASH_COLUMN - 1]);    
+                if (project.equals(splitted[0])) {
+                    hash = splitted[1];
+                    
+                    break;
+                }
             }
-            reader.close();
 
-            return hashes;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace(); 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+            if (line == null) break;
+             
+            while (true) {
+                String[] splitted = in.readLine().split(",");
+                
+                if (splitted.length > 1 && splitted[1].matches(FIX_DATE_PATTERN)) {
+                    fixDate = splitted[1];
+                   
+                    break;
+                }
+            }
+
+            if (startDate.compareTo(fixDate) <= 0 
+                    && endDate.compareTo(fixDate) > 0
+                    && (hashes.size() == 0 
+                    || (hashes.size() != 0 
+                    && !hashes.get(hashes.size() - 1).equals(hash)))) {
+                hashes.add(hash);    
+            }
+        } 
+        in.close();
+
+        return hashes;
     }
 }
