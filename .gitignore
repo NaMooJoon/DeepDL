@@ -1,3 +1,4 @@
 *.class
 .gradle
-*.class
+.idea
+.git/info/attributes
