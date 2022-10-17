@@ -6,7 +6,7 @@ package edu.handong.csee.isel.data.collector.github;
 class GitHubSearcher {
 
     public void cloneSnapshot(String path, String branch) {
-        
+
     }
 
     public String getSplittingCommit(String path) {
