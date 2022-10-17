@@ -1,4 +1,4 @@
-package edu.handong.csee.isel.data.collector;
+package edu.handong.csee.isel.data.collector.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 
 /**
- * Writes bfc properties in PySZZ json format.
+ * Wrtier that writes bfc properties in PySZZ json format.
 */
 public class PropertyWriter {
     public static String ORGANIZATION = "apache";
