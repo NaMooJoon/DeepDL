@@ -89,7 +89,7 @@ public class CommitHashReader {
     }
 
     /**
-     * Changes file to read.
+     * Changes this instance's file.
      * @param fileName file name
      */
     public void changeFile(String fileName) 
@@ -100,7 +100,7 @@ public class CommitHashReader {
     }
 
     /**
-     * Closes the file reader.
+     * Closes this instance.
      */
     public void close() throws IOException {
         in.close();
