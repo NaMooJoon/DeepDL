@@ -2,17 +2,17 @@ package edu.handong.csee.isel.data.collector.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import java.io.IOException;
 
 /**
  * Wrtier that writes bfc properties in PySZZ json format.
 */
 public class PropertyWriter {
-    public static String ORGANIZATION = "apache";
-    public static String LANGUAGE = "java";
+    private static final String ORGANIZATION = "apache";
+    private static final String LANGUAGE = "java";
     private PrintWriter out;
 
     /**

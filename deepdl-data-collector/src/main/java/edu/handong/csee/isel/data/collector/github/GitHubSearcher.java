@@ -1,14 +1,12 @@
 package edu.handong.csee.isel.data.collector.github;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.revwalk.RevCommit;
-
-import java.io.IOException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -22,7 +20,7 @@ public class GitHubSearcher {
     private String gitDir;
 
     /**
-     * Create <code>Git</code> object for using git commands. 
+     * Creates <code>Git</code> object for using git commands. 
      * @param gitDir a local git repository metadata directory 
      * @throws IOException
      */
@@ -44,7 +42,8 @@ public class GitHubSearcher {
             String startDate, String endDate) 
                     throws GitAPIException, NoHeadException ,IOException {  
         final long LOWER_BOUND = 0L;
-        final long UPPER_BOUND = 1000L * 60 * 60 * 24 * 365 * 60;               
+        final long UPPER_BOUND = 1000L * 60 * 60 * 24 * 365 * 60;           
+
         Date start = startDate != null ? Date.valueOf(startDate) 
                                        : new Date(LOWER_BOUND);     
         Date end = endDate != null ? Date.valueOf(endDate) 

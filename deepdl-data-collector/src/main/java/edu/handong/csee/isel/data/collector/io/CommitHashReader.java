@@ -2,10 +2,10 @@ package edu.handong.csee.isel.data.collector.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 
 /**
