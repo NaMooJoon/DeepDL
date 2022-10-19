@@ -2,14 +2,15 @@ package edu.handong.csee.isel.data.collector;
 
 import java.util.ArrayList;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+
+import edu.handong.csee.isel.data.collector.github.GitHubSearcher;
 //import edu.handong.csee.isel.data.collector.io.CommitHashReader;
 //import edu.handong.csee.isel.data.collector.io.PropertyWriter;
-import edu.handong.csee.isel.data.collector.github.GitHubSearcher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
 
 public class Test {
     public static void main(String[] args) {
@@ -23,13 +24,13 @@ public class Test {
     
             new PropertyWriter("test.json").writePySZZJson(projects, hashes);
             */
-            System.out.println(new GitHubSearcher("C:/activemq").getSplittingCommit().getRawBuffer());
+            System.out.println(new GitHubSearcher("C:/activemq/.git").getSplittingCommit(0.6F, null, null).getAuthorIdent().getWhen());
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         } catch(IOException e) {
             e.printStackTrace();
         } catch(NoHeadException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch(GitAPIException e) {
             e.printStackTrace();
         }
