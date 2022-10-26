@@ -11,7 +11,6 @@ import java.util.ArrayList;
  * Wrtier that writes bfc properties in PySZZ json format.
 */
 public class PropertyWriter {
-    private static final String ORGANIZATION = "apache";
     private static final String LANGUAGE = "java";
     private PrintWriter out;
 
@@ -25,17 +24,19 @@ public class PropertyWriter {
 
     /**
      * Writes full project name and fix commit hashes in PySZZ json format. 
-     * @param projects name of the projects
+     * @param repousers repousers
+     * @param repositories repositories
      * @param hashes hash codes of bfc commits
      */
-    public void writePySZZJson(String[] projects, ArrayList<String>[] hashes) {
+    public void writePySZZJson(String[] repousers, String[] repositories, 
+                               ArrayList<String>[] hashes) {
         out.print("[\n");
-
+        
         for (int i = 0; i < hashes.length; i++) {
             for (int j = 0; j < hashes[i].size(); j++) {
                 out.print("\t{\n");
-                out.printf("\t\t\"repo_name\": \"%s/%s\",\n", 
-                           ORGANIZATION, projects[i]);
+                out.printf("\t\t\"repo_name\": \"%s\",\n", 
+                           repousers[i] + "/" + repositories[i]);
                 out.printf("\t\t\"fix_commit_hash\": \"%s\",\n", 
                            hashes[i].get(j));
                 out.printf("\t\t\"language\": [\"%s\"]\n", LANGUAGE);
