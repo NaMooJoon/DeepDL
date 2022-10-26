@@ -1,6 +1,7 @@
 package edu.handong.csee.isel.data.collector.io;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,25 +19,30 @@ public class CommitHashReader {
     private BufferedReader in;
 
     /**
+     * Creates an empty reader.
+     */
+    public CommitHashReader() {}
+
+    /**
      * Creates <code>BufferedReader</code> that reads the file.
-     * @param fileName file name
+     * @param file file 
      * @throws FileNotFoundException
      */
-    public CommitHashReader(String fileName) throws FileNotFoundException {
-        in = new BufferedReader(new FileReader(fileName));
+    public CommitHashReader(File file) throws FileNotFoundException {
+        in = new BufferedReader(new FileReader(file));
     }
 
     /**
      * Reads commit hashes from [<code>startDate</code>, <code>endDate</code>).
      * Duplicate hashes are removed.
-     * @param project the name of the project
+     * @param repository the name of the repository
      * @param startDate YYYY-MM-DD format of start date 
      * @param endDate YYYY-MM-DD format of end date 
      * @return BFC hashes
      * @throws IOException
      * @throws FileFormatException
      */
-    public ArrayList<String> readCommitHashes(String project, 
+    public ArrayList<String> readCommitHashes(String repository, 
             String startDate, String endDate) 
                     throws IOException, FileFormatException {     
         ArrayList<String> hashes = new ArrayList<>();
@@ -53,7 +59,7 @@ public class CommitHashReader {
 
                 String[] splitted = line.split(",");
             
-                if (project.equals(splitted[0])) {
+                if (repository.equals(splitted[0])) {
                     hash = splitted[1];
                     
                     break;
@@ -90,13 +96,14 @@ public class CommitHashReader {
 
     /**
      * Changes this instance's file.
-     * @param fileName file name
+     * @param file file 
      */
-    public void changeFile(String fileName) 
+    public void changeFile(File file) 
             throws FileNotFoundException, IOException {
-        in.close();
-
-        in = new BufferedReader(new FileReader(fileName));
+        if (in != null) {
+            in.close();
+        }
+        in = new BufferedReader(new FileReader(file));
     }
 
     /**
