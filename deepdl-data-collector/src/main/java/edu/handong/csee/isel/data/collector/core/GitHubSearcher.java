@@ -16,6 +16,8 @@ import org.eclipse.jgit.api.errors.NoHeadException;
 public class GitHubSearcher {
     private Git git;
     
+    public GitHubSearcher() {}
+
     /**
      * Creates <code>Git</code> object for using git commands. 
      * @param gitDir a local git repository metadata directory 
@@ -30,9 +32,9 @@ public class GitHubSearcher {
      * The splitting commit splits this instance's repositoriy's commits from [<code>startDate</code>, <code>endDate</code>) in ratio of <code>trainRatio</code> : 1 - <code>trainRatio</code>.
      * The <code>startDate</code> and <code>endDate</code> should follow JDBC date escape format.
      * @param trainRatio a ratio of training commits
-     * @param startDate start date - yyyy-[m]m-[d]d
-     * @param endDate end date - yyyy-[m]m-[d]d
-     * @return splitting commit
+     * @param startDate start date of the repository's commit - yyyy-[m]m-[d]d
+     * @param endDate end date of the repository's commit - yyyy-[m]m-[d]d
+     * @return the splitting commit
      */
     public RevCommit getSplittingCommit(float trainRatio, 
             String startDate, String endDate) 
@@ -73,8 +75,9 @@ public class GitHubSearcher {
      * @throws IOException
      */
     public void changeRepository(String gitDir) throws IOException {
-        git.close();
-        
+        if (git != null) {
+            git.close();
+        }
         git = Git.open(new File(gitDir));
     }
 
