@@ -33,17 +33,18 @@ public class Extractor {
      * The file will be wrote in <code>projectPath</code>/out.
      * @param urls GitHub repository urls
      * @param jiraKeys the Jira keys 
-     * @param startDates start dates of the repositories' commits
-     * @param endDate end date of the repositories' commits
+     * @param repousers repousers of the repositories
+     * @param repositories the repositories
+     * @param startDates start dates of the repositories' BFC
+     * @param endDate end date of the repositories' BFC
      */
     public void extractBFC(String[] urls, String[] jiraKeys, 
+                           String[] repousers, String[] repositories,
                            String[] startDates, String endDate) {
         final String WINDOWS_FORMAT = 
                 "cmd.exe /c %s.bat patch -i %s patch -o %s -ij -jk %s";
         final String LINUX_FORMAT = 
                 "sh -c %s patch -i %s -o %s -ij -jk %s";
-        final int REPOUSER = 1;
-        final int REPOSITORY = 2;
         
         String format = System.getProperty("os.name")
                               .toLowerCase()
@@ -55,8 +56,6 @@ public class Extractor {
                                          "tools", "DPMiner", "DPMiner");   
         String patchPath = String.join(fileSeparator, "out", "patch");
         CommitHashReader reader = new CommitHashReader();
-        String[] repousers = new String[urls.length];
-        String[] repositories = new String[urls.length];
         ArrayList<String>[] hashes = new ArrayList[urls.length];
         File[] patches;
 
@@ -65,14 +64,9 @@ public class Extractor {
 
             for (int i = 0; i < urls.length; i++) { 
                 Object[] args = new Object[] { DPMinerPath, urls[i], 
-                                               patchPath, jiraKeys[i] };
-                String[] splittedUrl;                        
+                                               patchPath, jiraKeys[i] };                      
 
                 execute(String.format(format, args), projectPath);
-
-                splittedUrl = urls[i].split("/"); 
-                repousers[i] = splittedUrl[REPOUSER];
-                repositories[i] = splittedUrl[REPOSITORY];
             }
             patches = new File(patchPath).listFiles(new FileFilter() {
                 
@@ -151,3 +145,4 @@ public class Extractor {
         child.waitFor();
     }
 }
+
