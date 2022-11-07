@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.api.errors.TransportException;
 
 /**
  * Class that gets essential ingredients for DeepDL data collection from GitHub. 
@@ -67,6 +70,29 @@ public class GitHubSearcher {
     public void CheckoutToSnapshot(RevCommit splittedCommit) 
             throws GitAPIException {
         git.checkout().setStartPoint(splittedCommit.getParents()[0]).call();
+    }
+
+     /**
+     * Clones the repository to the given directory.
+     * Creates the directory by creating all of the nonexistent parent directory if there is no given directory.
+     * @param uri GitHub respository uri
+     * @param dir the directory
+     */
+    public void cloneRepository(String uri, String dir) {
+        File directory = new File(dir);
+        CloneCommand cloneCommand = new CloneCommand();
+
+        directory.mkdirs();
+
+        try {
+            cloneCommand.setURI(uri).setDirectory(directory).call().close();
+        } catch (InvalidRemoteException e) {
+            e.printStackTrace();
+        } catch (TransportException e) {
+            e.printStackTrace();
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
