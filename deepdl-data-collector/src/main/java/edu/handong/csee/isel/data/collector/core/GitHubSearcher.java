@@ -77,22 +77,18 @@ public class GitHubSearcher {
      * Creates the directory by creating all of the nonexistent parent directory if there is no given directory.
      * @param uri GitHub respository uri
      * @param dir the directory
+     * @throws InvaildRemoteException
+     * @throws TransportException
+     * @throws GitAPIException
      */
-    public void cloneRepository(String uri, String dir) {
+    public void cloneRepository(String uri, String dir) 
+            throws InvalidRemoteException, 
+                    TransportException, GitAPIException {
         File directory = new File(dir);
         CloneCommand cloneCommand = new CloneCommand();
 
         directory.mkdirs();
-
-        try {
-            cloneCommand.setURI(uri).setDirectory(directory).call().close();
-        } catch (InvalidRemoteException e) {
-            e.printStackTrace();
-        } catch (TransportException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
+        cloneCommand.setURI(uri).setDirectory(directory).call().close();
     }
 
     /**
