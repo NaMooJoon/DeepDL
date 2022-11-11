@@ -1,45 +1,83 @@
 package edu.handong.csee.isel.data.collector;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.revwalk.RevCommit;
 
+import edu.handong.csee.isel.data.collector.core.Extractor;
 import edu.handong.csee.isel.data.collector.core.GitHubSearcher;
+import edu.handong.csee.isel.data.collector.util.Resources;
 
 /**
  * Collector that collects data for DeepDL model.
  */
 public class DataCollector {
-    private String fileSeparator = System.getProperty("file.separator");
     private String projectPath = getProjectPath();
-    
+    private String fileSeparator = System.getProperty("file.separator");
+    private GitHubSearcher searcher = new GitHubSearcher();
+    private Extractor extractor = new Extractor(projectPath);
+
     /**
      * Collects data for DeepDL model.
      */
     public void collect() {
+        final String END_DATE = "2021-11-30";
+        final float TRAIN_RATIO = 0.6F;
+
         String repoPath = String.join(fileSeparator, 
                                       projectPath, "out", "repositories");
         String snapshotPath = String.join(fileSeparator,  
-                                          projectPath, "out", "snapshots");
-        CloneCommand cloneCommand = new CloneCommand();                                  
+                                          projectPath, "out", "snapshots");   
         List<String>[] resources = new List[4];
-        
+        RevCommit[] splittingCommits;
+        String[] startDates;
+        int numRepositories;
+
         loadResources(resources);
-        
-        for (int i = 0; i < resources[0].size(); i++) {
-            
+
+        numRepositories = resources[Resources.URL.ordinal()].size();
+        splittingCommits = new RevCommit[numRepositories];
+        startDates = new String[numRepositories];
+
+        try {
+            for (int i = 0; i < numRepositories; i++) {
+                searcher.cloneRepository(
+                        resources[Resources.URL.ordinal()].get(i), 
+                        String.join(fileSeparator, repoPath, 
+                                resources[Resources.REPOUSER.ordinal()]
+                                .get(i)));
+                searcher.cloneRepository(
+                        resources[Resources.URL.ordinal()].get(i), 
+                        snapshotPath);
+                searcher.changeRepository(
+                        String.join(fileSeparator, snapshotPath, 
+                                resources[Resources.REPOSITORY.ordinal()]
+                                .get(i), ".git"));
+
+                splittingCommits[i] = 
+                        searcher.getSplittingCommit(TRAIN_RATIO, 
+                                                    null, END_DATE);
+                startDates[i] = 
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
+                                Date.from(splittingCommits[i]
+                                          .getAuthorIdent()
+                                          .getWhen()
+                                          .toInstant()
+                                          .plusSeconds(1L)));
+            }
+            extractor.extractBFC(resources, startDates, END_DATE);
+            extractor.extractBIC();   
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-      
-        
-        
+
+        /*TO DO: */
     }
 
     /**
@@ -61,7 +99,7 @@ public class DataCollector {
 
     /**
      * Loads resources to the given array.
-     * Index 0: represents uris
+     * Index 0: represents urls
      * Index 1: represents jira keys.
      * Index 2: represents repousers
      * Index 3: represents repositories
@@ -78,8 +116,8 @@ public class DataCollector {
                 resources[i] = new ArrayList<String>();
             }
 
-            for (String uri : resources[0]) {
-                String[] splitted = uri.split("/");
+            for (String url : resources[0]) {
+                String[] splitted = url.split("/");
                 
                 for (int i = 2; i <= 3; i++) {
                     resources[i].add(splitted[i - 1]);
@@ -88,31 +126,5 @@ public class DataCollector {
         } catch(IOException e) {
             e.printStackTrace();
         } 
-    }
-
-    /**
-     * Clones given repository into <code>projectPath</code>/out/repositories and <code>projectPaht</code>/out/snapshots.
-     * @param uri GitHub respository uri
-     * @param repuserPath path to the repository repouser
-     * @param snapshotPath path to the snapshots
-     */
-    private void cloneRepository(String uri, 
-            String repouserPath, String snapshotPath) {
-        File repouser = new File(repouserPath);
-        CloneCommand cloneCommand = new CloneCommand();
-
-        if (!repouser.exists()) {
-            repouser.mkdir();
-        }
-        try {
-            cloneCommand.setURI(uri).setDirectory(repouser).call().close();
-            cloneCommand.setDirectory(new File(snapshotPath)).call().close();
-        } catch (InvalidRemoteException e) {
-            e.printStackTrace();
-        } catch (TransportException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
     }
 }
