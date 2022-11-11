@@ -36,8 +36,8 @@ public class CommitHashReader {
      * Reads commit hashes from [<code>startDate</code>, <code>endDate</code>).
      * Duplicate hashes are removed.
      * @param repository the name of the repository
-     * @param startDate YYYY-MM-DD format of start date 
-     * @param endDate YYYY-MM-DD format of end date 
+     * @param startDate yyyy-MM-dd HH:mm:ss format of start date 
+     * @param endDate yyyy-MM-dd HH:mm:ss format of end date 
      * @return BFC hashes
      * @throws IOException
      * @throws FileFormatException
