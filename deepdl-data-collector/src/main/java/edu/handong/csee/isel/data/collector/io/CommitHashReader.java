@@ -97,6 +97,8 @@ public class CommitHashReader {
     /**
      * Changes this instance's file.
      * @param file file 
+     * @throws FileNotFoundException
+     * @throws IOException
      */
     public void changeFile(File file) 
             throws FileNotFoundException, IOException {
