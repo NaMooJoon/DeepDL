@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.io.CommitHashReader;
 import edu.handong.csee.isel.data.collector.io.PropertyWriter;
+import edu.handong.csee.isel.data.collector.util.Resources;
 
 /**
  * Extracts BFC and BIC from GitHub repository.
@@ -31,80 +33,61 @@ public class Extractor {
     /**
      * Extracts BFC from [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
      * The file will be wrote in <code>projectPath</code>/out.
-     * @param urls GitHub repository urls
-     * @param jiraKeys the Jira keys 
-     * @param repousers repousers of the repositories
-     * @param repositories the repositories
+     * @param resources GitHub respositories informations
      * @param startDates start dates of the repositories' BFC
      * @param endDate end date of the repositories' BFC
+     * @throws IOException
+     * @throws InterruptedExcption
+     * @throws FileFormatException
      */
-    public void extractBFC(String[] urls, String[] jiraKeys, 
-                           String[] repousers, String[] repositories,
-                           String[] startDates, String endDate) {
+    public void extractBFC(List<String>[] resources, 
+            String[] startDates, String endDate) 
+                    throws IOException, InterruptedException, 
+                            FileFormatException {
         final String WINDOWS_FORMAT = 
-                "cmd.exe /c %s.bat patch -i %s patch -o %s -ij -jk %s";
+                "cmd.exe /c %s.bat patch -i %s -o %s -ij -jk %s";
         final String LINUX_FORMAT = 
-                "sh -c %s patch -i %s -o %s -ij -jk %s";
+                "sh -c ./%s patch -i %s -o %s -ij -jk %s";
         
         String format = System.getProperty("os.name")
                               .toLowerCase()
                               .startsWith("windows") 
                                 ? WINDOWS_FORMAT
                                 : LINUX_FORMAT; 
-        String fileName = String.join(fileSeparator, "out", "bfc.json"); 
         String DPMinerPath = String.join(fileSeparator, 
-                                         "tools", "DPMiner", "DPMiner");   
-        String patchPath = String.join(fileSeparator, "out", "patch");
+                                         "tool", "dpminer", "DPMiner");   
+        String patchPath = String.join(fileSeparator, "out", "patches");
+        List<String> urls = resources[Resources.URL.ordinal()];
+        List<String> keys = resources[Resources.KEY.ordinal()];
+        List<String> repousers = resources[Resources.REPOUSER.ordinal()];
+        List<String> repositories = resources[Resources.REPOSITORY.ordinal()];
+        String fileName = String.join(fileSeparator, patchPath, "out", "bfc.json"); 
         CommitHashReader reader = new CommitHashReader();
-        ArrayList<String>[] hashes = new ArrayList[urls.length];
-        File[] patches;
+        PropertyWriter writer = new PropertyWriter(fileName);
+        ArrayList<String>[] hashes = new ArrayList[urls.size()];
+        
+        for (int i = 0; i < urls.size(); i++) { 
+            Object[] args = new Object[] { DPMinerPath, urls.get(i), 
+                                           patchPath, keys.get(i) };                      
 
-        try {
-            PropertyWriter writer = new PropertyWriter(fileName);
-
-            for (int i = 0; i < urls.length; i++) { 
-                Object[] args = new Object[] { DPMinerPath, urls[i], 
-                                               patchPath, jiraKeys[i] };                      
-
-                execute(String.format(format, args), projectPath);
-            }
-            patches = new File(patchPath).listFiles(new FileFilter() {
-                
-                @Override
-                public boolean accept(File file) {
-                    return file.getName().matches("PATCH_\\w+.csv");
-                }
-            });
-
-            Arrays.sort(patches, new Comparator<File>() {
-
-                @Override
-                public int compare(File o1, File o2) {
-                    return (int) (o1.lastModified() - o2.lastModified());
-                }    
-            });
-
-            for (int i = 0; i < urls.length; i++) {
-                reader.changeFile(patches[i]);
-                
-                hashes[i] = reader.readCommitHashes(repositories[i], 
-                                                    startDates[i], endDate);
-            }
-            writer.writePySZZJson(repousers, repositories, hashes);
-        } catch(IOException e) {
-            e.printStackTrace();
-        } catch(InterruptedException e) {
-            e.printStackTrace();
-        } catch(FileFormatException e) {
-            e.printStackTrace();
+            execute(String.format(format, args), projectPath);
+            reader.changeFile(
+                        new File(patchPath, 
+                                 "PATCH_" + repositories.get(i) + ".csv"));
+            
+            hashes[i] = reader.readCommitHashes(repositories.get(i), 
+                                                startDates[i], endDate);
         }
+        writer.writePySZZJson(repousers, repositories, hashes);
     }
 
     /**
      * Extracts BIC and writes it in json file using PySZZ.
      * The file will be wrote in <code>projectPath</code>/out.
+     * @throws IOException
+     * @throws InterruptedException
      */
-    public void extractBIC() {
+    public void extractBIC() throws IOException, InterruptedException {
         final String WINDOWS_FORMAT = 
                 "cmd.exe /c python %s %s tools\\pyszz\\conf\\raszz.yaml %s";
         final String LINUX_FORMAT = 
@@ -120,14 +103,8 @@ public class Extractor {
         String BFCPath = String.join(fileSeparator, "out", "bfc.json");
         String repoPath = String.join(fileSeparator, "out", "repositories");
         
-        try {
-            execute(String.format(format, PySZZPath, BFCPath, repoPath), 
-                    projectPath);
-        } catch(IOException e) {
-            e.printStackTrace();
-        } catch(InterruptedException e) {
-            e.printStackTrace();
-        }
+        execute(String.format(format, PySZZPath, BFCPath, repoPath), 
+                projectPath);
     }
 
     /**
@@ -143,6 +120,6 @@ public class Extractor {
                                .exec(command, null, new File(dir));
 
         child.waitFor();
-    }
+    }    
 }
 
