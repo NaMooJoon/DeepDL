@@ -18,8 +18,8 @@ import edu.handong.csee.isel.data.collector.util.Resources;
  * Collector that collects data for DeepDL model.
  */
 public class DataCollector {
-    private String projectPath = getProjectPath();
     private String fileSeparator = System.getProperty("file.separator");
+    private String projectPath = getProjectPath();
     private GitHubSearcher searcher = new GitHubSearcher();
     private Extractor extractor = new Extractor(projectPath);
 
@@ -63,6 +63,9 @@ public class DataCollector {
                 splittingCommits[i] = 
                         searcher.getSplittingCommit(TRAIN_RATIO, 
                                                     null, END_DATE);
+                
+                searcher.checkoutToSnapshot(splittingCommits[i]);
+
                 startDates[i] = 
                         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
                                 Date.from(splittingCommits[i]
@@ -73,11 +76,11 @@ public class DataCollector {
             }
             extractor.extractBFC(resources, startDates, END_DATE);
             extractor.extractBIC();   
+
+
         } catch(Exception e) {
             e.printStackTrace();
         }
-
-        /*TO DO: */
     }
 
     /**
@@ -87,8 +90,10 @@ public class DataCollector {
     private String getProjectPath() {
         final int NUM_STEPS = 3; 
         
-        String[] splittedCwd = System.getProperty("user.dir")
-                                     .split(fileSeparator);        
+        String regex = fileSeparator.equals("\\") 
+                ? fileSeparator + fileSeparator 
+                : fileSeparator;
+        String[] splittedCwd = System.getProperty("user.dir").split(regex);        
         String[] splittedProjectPath = new String[splittedCwd.length - NUM_STEPS];  
         
         for (int i = 0; i < splittedProjectPath.length; i++) {
@@ -100,7 +105,7 @@ public class DataCollector {
     /**
      * Loads resources to the given array.
      * Index 0: represents urls
-     * Index 1: represents jira keys.
+     * Index 1: represents jira keys
      * Index 2: represents repousers
      * Index 3: represents repositories
      * @param resources resource array
@@ -109,7 +114,7 @@ public class DataCollector {
         Path resourcePath = Path.of(projectPath, "src", "main", "resources");
 
         try {
-            resources[0] = Files.readAllLines(resourcePath.resolve("uri"));
+            resources[0] = Files.readAllLines(resourcePath.resolve("url"));
             resources[1] = Files.readAllLines(resourcePath.resolve("jira-key"));
             
             for (int i = 2; i <= 3; i++) {
