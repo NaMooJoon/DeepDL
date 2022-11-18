@@ -19,20 +19,6 @@ public class CommitHashReader {
     private BufferedReader in;
 
     /**
-     * Creates an empty reader.
-     */
-    public CommitHashReader() {}
-
-    /**
-     * Creates <code>BufferedReader</code> that reads the file.
-     * @param file file 
-     * @throws FileNotFoundException
-     */
-    public CommitHashReader(File file) throws FileNotFoundException {
-        in = new BufferedReader(new FileReader(file));
-    }
-
-    /**
      * Reads commit hashes from [<code>startDate</code>, <code>endDate</code>).
      * Duplicate hashes are removed.
      * @param repository the name of the repository
