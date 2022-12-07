@@ -26,7 +26,7 @@ public class DatasetMaker {
      * @param splittingPoint the splitting point
      */
     public void makeDataset(JSONArray commits, Date splittingPoint) {
-        
+                
 
     }
 
