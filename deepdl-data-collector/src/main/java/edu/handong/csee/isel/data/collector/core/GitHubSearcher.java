@@ -32,11 +32,11 @@ public class GitHubSearcher {
 
     /**
      * Gets splitting commit from this instance's repository.
-     * The splitting commit splits this instance's repositoriy's commits from [<code>startDate</code>, <code>endDate</code>) in ratio of <code>trainRatio</code> : 1 - <code>trainRatio</code>.
+     * The splitting commit splits this instance's repository's commits from [<code>startDate</code>, <code>endDate</code>) in ratio of <code>trainRatio</code> : 1 - <code>trainRatio</code>.
      * The <code>startDate</code> and <code>endDate</code> should follow JDBC date escape format.
      * @param trainRatio a ratio of training commits
-     * @param startDate start date of the repository's commit - yyyy-[m]m-[d]d
-     * @param endDate end date of the repository's commit - yyyy-[m]m-[d]d
+     * @param startDate start date of the repository's commit - yyyy-[M]M-[d]d
+     * @param endDate end date of the repository's commit - yyyy-[M]M-[d]d
      * @return the splitting commit
      */
     public RevCommit getSplittingCommit(float trainRatio, 
@@ -67,9 +67,13 @@ public class GitHubSearcher {
      * @param splittedCommit the splitted commit
      * @throws GitAPIException 
      */
-    public void CheckoutToSnapshot(RevCommit splittedCommit) 
+    public void checkoutToSnapshot(RevCommit splittedCommit) 
             throws GitAPIException {
-        git.checkout().setStartPoint(splittedCommit.getParents()[0]).call();
+        git.checkout()
+           .setCreateBranch(true)
+           .setName("snapshot")
+           .setStartPoint(splittedCommit.getParents()[0])
+           .call();
     }
 
      /**
@@ -87,7 +91,6 @@ public class GitHubSearcher {
         File directory = new File(dir);
         CloneCommand cloneCommand = new CloneCommand();
 
-        directory.mkdirs();
         cloneCommand.setURI(uri).setDirectory(directory).call().close();
     }
 
