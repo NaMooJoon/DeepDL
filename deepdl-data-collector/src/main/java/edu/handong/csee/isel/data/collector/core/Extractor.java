@@ -1,17 +1,17 @@
 package edu.handong.csee.isel.data.collector.core;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.io.CommitHashReader;
-import edu.handong.csee.isel.data.collector.io.PropertyWriter;
+import edu.handong.csee.isel.data.collector.io.BFCWriter;
 import edu.handong.csee.isel.data.collector.util.Resources;
+import edu.handong.csee.isel.data.collector.util.Utils;
 
 /**
  * Extracts BFC and BIC from GitHub repository.
@@ -20,91 +20,91 @@ import edu.handong.csee.isel.data.collector.util.Resources;
  */
 public class Extractor {
     private String fileSeparator = System.getProperty("file.separator");
-    private String projectPath;
-    
-    /**
-     * Sets this instance's project path.
-     * @param projectPath the project path
-     */
-    public Extractor(String projectPath) {
-        this.projectPath = projectPath;
-    }
+    private String projectPath = Utils.getProjectPath();
+    private boolean isWindows = System.getProperty("os.name")
+                                      .toLowerCase()
+                                      .startsWith("windows");
 
     /**
-     * Extracts BFC from [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
-     * The file will be wrote in <code>projectPath</code>/out.
-     * @param resources GitHub respositories informations
-     * @param startDates start dates of the repositories' BFC
+     * Extracts BFC of the given GitHub repository from [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
+     * The file will be written in <code>projectPath</code>/out/bfc.
+     * @param url the url of the respository 
+	 * @param key the Jira key of the repository
+	 * @param repouser the repouser of the repository
+	 * @param repository the name of the repository
+     * @param startDate start date of the repositories' BFC
      * @param endDate end date of the repositories' BFC
      * @throws IOException
      * @throws InterruptedExcption
      * @throws FileFormatException
      */
-    public void extractBFC(List<String>[] resources, 
-            String[] startDates, String endDate) 
-                    throws IOException, InterruptedException, 
-                            FileFormatException {
+    public void extractBFC(String url, String key, 
+						   String repouser, String repository, 
+            			   String startDate, String endDate) 
+                    				throws IOException, InterruptedException, 
+                            		  	   FileFormatException {
         final String WINDOWS_FORMAT = 
-                "cmd.exe /c %s.bat patch -i %s -o %s -ij -jk %s";
+                "cmd.exe /c %s patch -i %s -o %s -ij -jk %s";
         final String LINUX_FORMAT = 
-                "sh -c ./%s patch -i %s -o %s -ij -jk %s";
+                "sh -c %s patch -i %s -o %s -ij -jk %s";
         
-        String format = System.getProperty("os.name")
-                              .toLowerCase()
-                              .startsWith("windows") 
-                                ? WINDOWS_FORMAT
-                                : LINUX_FORMAT; 
-        String DPMinerPath = String.join(fileSeparator, 
-                                         "tool", "dpminer", "DPMiner");   
-        String patchPath = String.join(fileSeparator, "out", "patches");
-        List<String> urls = resources[Resources.URL.ordinal()];
-        List<String> keys = resources[Resources.KEY.ordinal()];
-        List<String> repousers = resources[Resources.REPOUSER.ordinal()];
-        List<String> repositories = resources[Resources.REPOSITORY.ordinal()];
-        String fileName = String.join(fileSeparator, patchPath, "out", "bfc.json"); 
-        CommitHashReader reader = new CommitHashReader();
-        PropertyWriter writer = new PropertyWriter(fileName);
-        ArrayList<String>[] hashes = new ArrayList[urls.size()];
-        
-        for (int i = 0; i < urls.size(); i++) { 
-            Object[] args = new Object[] { DPMinerPath, urls.get(i), 
-                                           patchPath, keys.get(i) };                      
-
-            execute(String.format(format, args), projectPath);
-            reader.changeFile(
-                        new File(patchPath, 
-                                 "PATCH_" + repositories.get(i) + ".csv"));
-            
-            hashes[i] = reader.readCommitHashes(repositories.get(i), 
-                                                startDates[i], endDate);
-        }
-        writer.writePySZZJson(repousers, repositories, hashes);
+		CommitHashReader reader;
+        String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT; 
+        String DPMinerPath = 
+				isWindows ? String.join(fileSeparator, 
+							  			"..", "tools", "dpminer", 
+										"bin", "DPMiner.bat")
+                		  : String.join(fileSeparator, 
+							  			"..", "tools", "dpminer", 
+										"bin", "DPMiner");
+        String patchPath = String.join(fileSeparator, "out", "patch");
+        String fileName = String.join(fileSeparator, 
+                                      projectPath, "out", "bfc", 
+									  "bfc_" + repository + ".json"); 
+		Object[] args = new Object[] { DPMinerPath, url, 
+									   patchPath, key };  
+        BFCWriter writer = new BFCWriter(fileName);
+	                    
+		execute(String.format(format, args), projectPath);
+		
+		reader = 
+				new CommitHashReader(
+						new File(String.join(fileSeparator, 
+								 			 projectPath, patchPath), 
+								 "PATCH_" + repository + ".csv"));
+		
+        writer.writeBFC(repouser, repository, 
+						reader.readCommitHashes(repository, 
+												startDate, endDate));
+        reader.close();
+        writer.close();
     }
 
     /**
      * Extracts BIC and writes it in json file using PySZZ.
-     * The file will be wrote in <code>projectPath</code>/out.
+     * The file will be written in <code>projectPath</code>/out.
      * @throws IOException
      * @throws InterruptedException
      */
-    public void extractBIC() throws IOException, InterruptedException {
+    public void extractBIC(String repository) throws IOException, InterruptedException {
         final String WINDOWS_FORMAT = 
-                "cmd.exe /c python %s %s tools\\pyszz\\conf\\raszz.yaml %s";
+                "cmd.exe /c python %s %s tools\\pyszz\\conf\\raszz.yml %s";
         final String LINUX_FORMAT = 
                 "sh -c python %s %s tools/pyszz/conf/raszz.yaml %s";
         
-        String format = System.getProperty("os.name")
-                              .toLowerCase()
-                              .startsWith("windows")
-                                ? WINDOWS_FORMAT
-                                : LINUX_FORMAT;
+        String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT;
         String PySZZPath = String.join(fileSeparator, 
-                                       "tools", "pyszz", "main.py");
-        String BFCPath = String.join(fileSeparator, "out", "bfc.json");
-        String repoPath = String.join(fileSeparator, "out", "repositories");
-        
-        execute(String.format(format, PySZZPath, BFCPath, repoPath), 
-                projectPath);
+                                       "..", "tools", "pyszz");
+		String mainPath = String.join(fileSeparator, PySZZPath, "main.py");
+        String BFCPath = String.join(fileSeparator, "out", "bfc", "bfc_" + repository + ".json");
+		String ymlPath = String.join(fileSeparator, PySZZPath, "conf", "raszz.yml");
+        String repoPath = String.join(fileSeparator, "out", "snapshot");
+		String PySZZOutPath = String.join(fileSeparator, projectPath, PySZZPath, "out");
+
+        execute(String.format(format, mainPath, BFCPath, ymlPath, repoPath), 
+                projectPath);    
+        Files.move(Path.of(PySZZOutPath, new File(PySZZOutPath).list()[0]),
+				   Path.of(projectPath, "out", "bic", "bic_" + repository + ".json"));
     }
 
     /**
