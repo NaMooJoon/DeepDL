@@ -18,6 +18,10 @@ public class CommitHashReader {
     
     private BufferedReader in;
 
+    public CommitHashReader(File file) throws FileNotFoundException {
+        in = new BufferedReader(new FileReader(file));
+    }
+
     /**
      * Reads commit hashes from [<code>startDate</code>, <code>endDate</code>).
      * Duplicate hashes are removed.
@@ -78,20 +82,6 @@ public class CommitHashReader {
                 }
             }
         }
-    }
-
-    /**
-     * Changes this instance's file.
-     * @param file file 
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public void changeFile(File file) 
-            throws FileNotFoundException, IOException {
-        if (in != null) {
-            in.close();
-        }
-        in = new BufferedReader(new FileReader(file));
     }
 
     /**
