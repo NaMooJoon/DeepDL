@@ -25,6 +25,13 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r'
+    
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation 'org.json:json:20220320'
+
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+
 }
 
 application {
