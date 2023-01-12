@@ -50,11 +50,11 @@ public class Extractor {
         String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT; 
         String DPMinerPath = 
 				isWindows ? String.join(fileSeparator, 
-							  			"..", "tools", "dpminer", 
+							  			"..", "tools", "DPminer", 
 										"bin", "DPMiner.bat")
                 		  : String.join(fileSeparator, 
-							  			"..", "tools", "dpminer", 
-										"bin", "DPMiner");
+							  			"..", "tools", "DPminer", 
+										"bin", "./DPMiner");
         String patchPath = String.join(fileSeparator, "out", "patch");
         String fileName = String.join(fileSeparator, 
                                       projectPath, "out", "bfc", 
