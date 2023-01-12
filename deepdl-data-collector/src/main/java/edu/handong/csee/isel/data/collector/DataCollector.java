@@ -45,9 +45,8 @@ public class DataCollector {
         try {
             Files.createDirectory(Path.of(projectPath, "out", "bfc"));
             Files.createDirectory(Path.of(projectPath, "out", "bic"));
-
+            
             for (int i = 0; i < numRepositories; i++) {
-                String startDate;
                 String repoPath = 
                         String.join(fileSeparator, snapshotPath, 
                                 resources[Resources.REPOUSER.ordinal()].get(i),
@@ -58,11 +57,11 @@ public class DataCollector {
                         resources[Resources.URL.ordinal()].get(i), repoPath);
                 searcher.changeRepository(
                         String.join(fileSeparator, repoPath, ".git"));
-
+            
                 splittingCommits[i] = 
                         searcher.getSplittingCommit(TRAIN_RATIO, 
                                                     null, END_DATE);
-                startDate = 
+                String startDate = 
                         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
                                 Date.from(splittingCommits[i]
                                           .getAuthorIdent()
@@ -75,12 +74,12 @@ public class DataCollector {
                         resources[Resources.REPOUSER.ordinal()].get(i), 
                         resources[Resources.REPOSITORY.ordinal()].get(i),
                         startDate, END_DATE);
-                //extractor.extractBIC(
-                //        resources[Resources.REPOSITORY.ordinal()].get(i));
+                extractor.extractBIC(
+                        resources[Resources.REPOSITORY.ordinal()].get(i));
                 
                 searcher.checkoutToSnapshot(splittingCommits[i]);
+            
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

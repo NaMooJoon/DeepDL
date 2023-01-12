@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.json.JSONArray;
 
-import edu.handong.csee.isel.data.collector.core.GitHubSearcher;
-
 /**
  * Class that makes dataset for DeepDL model.
  */

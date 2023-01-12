@@ -11,9 +11,9 @@ public class Utils {
         final String PROJECT_DIR = "deepdl-data-collector";
 
         String fileSeparator = System.getProperty("file.separator");
-        String regex = fileSeparator.equals("\\") 
-                ? fileSeparator + fileSeparator 
-                : fileSeparator;
+        String regex = 
+                fileSeparator.equals("\\") 
+                        ? fileSeparator + fileSeparator : fileSeparator;
         String[] splittedCwd = System.getProperty("user.dir").split(regex);        
         ArrayList<String> splittedProjectPath = new ArrayList<>();  
         

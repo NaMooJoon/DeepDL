@@ -1,16 +1,14 @@
 package edu.handong.csee.isel.data.collector.core;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.io.CommitHashReader;
 import edu.handong.csee.isel.data.collector.io.BFCWriter;
-import edu.handong.csee.isel.data.collector.util.Resources;
 import edu.handong.csee.isel.data.collector.util.Utils;
 
 /**
@@ -88,28 +86,40 @@ public class Extractor {
      */
     public void extractBIC(String repository) throws IOException, InterruptedException {
         final String WINDOWS_FORMAT = 
-                "cmd.exe /c python %s %s tools\\pyszz\\conf\\raszz.yml %s";
+                "cmd.exe /c python %s %s %s %s";
         final String LINUX_FORMAT = 
-                "sh -c python %s %s tools/pyszz/conf/raszz.yaml %s";
+                "sh -c python %s %s %s %s";
         
         String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT;
         String PySZZPath = String.join(fileSeparator, 
                                        "..", "tools", "pyszz");
 		String mainPath = String.join(fileSeparator, PySZZPath, "main.py");
-        String BFCPath = String.join(fileSeparator, "out", "bfc", "bfc_" + repository + ".json");
-		String ymlPath = String.join(fileSeparator, PySZZPath, "conf", "raszz.yml");
+        String BFCPath = String.join(fileSeparator, 
+                                     "out", "bfc", 
+                                     "bfc_" + repository + ".json");
+		String ymlPath = String.join(fileSeparator, 
+                                     PySZZPath, "conf", "raszz.yml");
         String repoPath = String.join(fileSeparator, "out", "snapshot");
-		String PySZZOutPath = String.join(fileSeparator, projectPath, PySZZPath, "out");
-
+		String outPath = String.join(fileSeparator, projectPath, "out");
+        
         execute(String.format(format, mainPath, BFCPath, ymlPath, repoPath), 
                 projectPath);    
-        Files.move(Path.of(PySZZOutPath, new File(PySZZOutPath).list()[0]),
-				   Path.of(projectPath, "out", "bic", "bic_" + repository + ".json"));
+        Files.move(Path.of(outPath, 
+                           new File(outPath).list(
+                                new FilenameFilter() {
+                                    @Override 
+                                    public boolean accept(File dir, 
+                                                          String name) {
+                                        return name.matches(
+                                                "bic_ra_\\d+.json");  
+                                    }
+                                })[0]),  
+				   Path.of(outPath, "bic", "bic_" + repository + ".json"));
     }
 
     /**
-     * Executes either windows or linux commad based on the user's os system.
-     * @param command a command to execute
+     * Executes the given command in the subprocess.
+     * @param command the command
      * @param dir the directory in which executes the command
      * @throws IOException
      * @throws InterruptedException
