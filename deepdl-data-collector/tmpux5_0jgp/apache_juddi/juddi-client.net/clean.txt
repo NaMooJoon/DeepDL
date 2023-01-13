@@ -1,1 +1,0 @@
-juddi-client.net\juddi-client.net.sln /target:clean
