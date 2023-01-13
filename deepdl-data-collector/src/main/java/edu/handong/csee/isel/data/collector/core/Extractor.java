@@ -63,7 +63,7 @@ public class Extractor {
 		CommitHashReader reader;
         String DPMinerPath = String.join(fileSeparator, 
 							  			"..", "tools", 
-                                        "DPminer", "bin", program);
+                                        "DPMiner", "bin", program);
         String patchPath = String.join(fileSeparator, "out", "patch");
         String argument = String.join(" ", 
                                       DPMinerPath + "patch", 
