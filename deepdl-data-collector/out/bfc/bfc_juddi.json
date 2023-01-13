@@ -1,0 +1,1147 @@
+[
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4d7bc5a3bf37e7d5341286432c129f8fb1a4b203",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7a26bedd92cff633d641118d19b5237ac8474105",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ab728473c9197a48c15934bedafde537d502512d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "93f2d3693cff16e52129171368d36b2580bbbbfc",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f9ca9042de955fd61e3c8edf65b6616526ca1a43",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7d562f926b974d46b5e0f9e76d774a10ff9dc889",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c8bce39ec3efd546a2dd4e4fd5e072cc218a86a1",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b2388cb66f11981733201a24de9234c205b217a7",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ac888830b6e710334643f4ce33e5dd9f34d52db3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "13101ecb48ad76fbb3a8c4aee84852887aae340d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5ac79c870c2e804ca154ee1dc207e6a8087d609d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "07790a220657525c85d446ed9427aa9ac3fac6ee",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4522d6fb5bf61408aa8a4f20e47f2ee2813b48ff",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "854d5708bed7f025613916c182db9bbc879ba6cb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "539b31b8d2d7e7e6db13814943eec80cef3f3c4c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c64ec446760f5efec489c3a967388145c98b2973",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "74e4985301ed7444f649f2e55cd2391a59acae99",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8016bf340db08da87391129cfec23a59b1473691",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2f5a2492e49a64da73e29bc5ba0a8bf151b49bdb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e4112296a261249fc41663341933f3a931f5f07c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "79f0ab8c9841367e546251ac606f7335bed92529",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9c3336041f310ebd965d11d172ca50d0bd0b75ff",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "af452e119631055c5e9a1d5bdc136af46f5bede0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ee347328e430b966c27fc1c65723091e69b6acb4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9c77acdf9f3d47accec70a6e91cabf6ad304a00c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6ea7ff2503c0a536c6f35d6806b114688d7d4063",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "193fa4c56e8a44c9672a043d5e9e56c1d6cc99c2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "3e354954d9fea806c685ca91dffc9a4cea42c8e3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f1f6bf037a4774c4f076a1b479dba2252b04426a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a8785abb7aeeeecee0b6d43edb5be484b70560fb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b09a6fb7785a9c02675847577c3cc37a2a9cb84c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a967991ae7641ba89caf4e4c7d81fe89e9e78c1e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "3f8dc0303641c12cd10f836402218aa391b7c236",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "83312bd2aa23fbed63312f1ff2cabb0770baf998",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4f63c9cb7a749ed1eefaecb4673786aa1595a4a1",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "29593c748b49688bd2adbc21a84c1883b110800f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "988624e55415f90344208334c179659fa93b5807",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ed1692d1ccddaa564c5bd361bb0877384be4fedb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "776d9081dc06e07f75c8a79e52b4e6183393a53a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1dcd5285f3513f48aff5b763c8328dfbd2027dbb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d2ccea33dac4ebca14bf6a17bc0b1df145315a61",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "3fb9382b3872a5a375fc9fa0610ba32b1cdafb00",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f0a1ae7f66fbbc828c0d7031afded9a1fb8623de",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "bbf1cccd63a65593b023bb35a5f3da4576c9437f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0c3ac4f1e2fa7c6fb5b1f63bff26734cd6069d70",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5eda4a714c86584b24576a51a9995d72240fa55c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "09abb1b4e2d37c05e5adf866bd00393060b96e5a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2a243727f055bfdf97dc37e1e3dffc8a09a40199",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8c5350d8f7c554f4826096791f94aaed7b4ebf7f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "75f1a2b7d778c5ad349892d691cf1ab82bcfac67",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2ba82c8ea43ed7e405dda8f4e3894d109ab89ca8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "86d58ae417563ea973a970b76914352becb31fb8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2bf444ca145066136b67e0d886ef0903a0f42616",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9be9a865dea400aa4647b5b336bc6f2799dc8b13",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4a7e282e9a822ecdf7d65a48765b8f4a37815399",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "690bfb0157cb9c6a54f367f231326b432ecb6a33",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7ccb68295ace2e1ce5bb98f026a3645448c47de3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "32fd00534079181b8fef1bfdd2adfab26569c579",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8f7c669da1bfb76c63be3cb03a45832c45787fa9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "15ed423ba60de94a2253a87d73b4b6e49fb35339",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "70903c27054e1ebb8c064cc3a1afce9842c07cb5",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c674214cb109f69b6eeef136da83cf9f3398bf06",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0806d36d9fd610bd8e6d45fe4b809b44a5a0ecc7",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c6bab253ff37d0ea1d1dcc86cbeed98d8e6f1249",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7806a1129a9a2e069b7cc837699e273858e3fe72",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "bacfa9353a1c6bd29093c4c4652044cb4fae3f64",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4429dadd5325128521122bfebf84b8df24bad1a8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9d22690eee0aae19f98191c00a00833bf6a28f5c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "197e1d1d6ba0780e395dd5ce4915276c39becbbb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "36661e1577004764a3ab26cfef324c28ca6823cb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a0bfccd6af1a25ddb3ca78d4f99d56bb580e8ff4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "df037b02fbb92624996e004ae84cfca43f87a769",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c807b057d687eb4b3026485cc46d63eb0c2ad47b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0f8e9eeafef28247c7790c7bdf6e4b9a84d1a3ae",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "bc46aeb136a7d7920a021faa446758c685d294cc",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "37c6b3685751bd67c44da5f70f51e654ce5ae9c0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ba7c8357641404235bc37825880c03e722993b24",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8eff90e467ad2ab439299c7b96ff57fdcaacf634",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2c06b736e0b911441888e1b150ba47ec170e3676",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6eda22894c15585a6cc9d013d45b531b1d2920b9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5ee04c732a855c5afade8f67a6c038d70cc12100",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "034954fca5c5e6fef2b1fcd9b1c1b13809dd51cd",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8ecfc7ff4ee41a9965c00f54f9cebe436b1a0d58",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "2ac661d618483a768d1d99ed30bd8cff29b598fe",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a9e1cfd1d91a424c7125551fe8169385d290c25b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "142285223e21d4996d617a111da1afaab6dc8c47",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e162a832e6bc6ed8a33a6efbd3373c97d842b839",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0e99c78a3dc7771cb92c435ce61063ce80663f98",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ebae76007d3cd94acfdd7ae8dfa201c408d98e88",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4f99a04028ff0a4ee93521498f4c16cbe1220daf",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7533e3329c55ccdae284a67cd4f6460d152a0769",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5355c4bb735a9441caeffc8e819498e496a7a1f4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c180add058f565bd282e592df622e1444176b4c2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c8e7efe78d2deb7e9d192c05c250b47d58375fd4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f73178d65fbc285896b6ad8c55fd09b797abe87e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "06b69f2d2d5ba42e23e35f3e29bfbbb80fde140f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1a95a5e186003517bdedac6c1b3a354a63c893c0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e4db942de9a69e9a54170d870f05e2b93acd6658",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1464a7d2c95f939e388c825e84dc44be93f4120d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "445e6000a9cd0b6f88103a029585d6a4112f855f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b0490fdf91e7070d93840aeb74c152a903884e3f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d86f21608af9d758c953ade7368f50a964997f43",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7891ad0678125411537506b7c56c332c13e2a097",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "50dd71a713cf704f1b94425ff3bd78507b19e4d6",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "bf4183dacf36062b2eda5c90d641ed983b9ca65b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6f95825a92fbf14a5ab8ce7230d1ae2f1a3fc9f9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b19232cb5b7acd1b66b7026b4c5746a4b2b3eac2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0ee76293f663c603490cd6b53cdd7b47f555088a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e86f5f9d48c00a6949f13c11ba1c8aff2e5d5aa2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c7af4ebc809ccac62e1b52b96240f30da50ab627",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b63fa2c461d8a721cef6e71d60cace7658e40fc6",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "50675b65069582b49372b53b35027e11d6fdbbfd",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "16c9417dd222fd81c093e235a826f54fc649d56e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a041106e566e1f18cc6ca70637b4d81ee6affe2f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "594c78a9dfccbf5d33ce6ac0eb7242327deed5fb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a74409f9b8cb4d73e3f510fbd9f7129fd8d4b6e3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fa0f20a11ce8c44894fec0cdb0cc46684ba8fa8b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d3318062e7b782e42a20e39a153dacfab10b1c6c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d64238eaf89e7604d3437cedd48bf2af470720f0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "84f3d7f9dbc2436e107a55cc0d7d8d8075c24faa",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fbcbd21cf19f1e6a5f2145fb9e7cb14dc081807a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4bf087b8ec8140952838b727a69bb597120bb00b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d2f5fbe1fefbeddce77b5f331191845bac78cdf2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c531fcad7edf61cecdfd2d78f4ac27518465fbf6",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "979566a4fca7862099c7d03dba8d4bd3b7682aae",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "abc8891455d630fcd418156762a75f4bf8659d04",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b13047171693331a53335059c31aeacf3dae7700",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4b0d76a0d855245dbd7310206456eee4d8dd3376",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "de30268257b990fa6aa19757d74785d67f94e972",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "de2c7ed62b52bcb56e4984fa3520d1d748635bf6",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5c1a807d9dbb7d43cdd63df1321e92b0d4e53fd9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "dea489063c131a11f6c8bc6c2d1750c49fc865c4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4bc282b4e9bfb97e7674471757c41039d6cbaf75",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f71dc8f2634bc126e90a3d27a3e723f346202192",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "35d4a2f79da5df93b2e6a7c8fcfc2f5366549809",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4475971554cbf268a9751d4c7765cc4ae9e89576",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6182be418dbf8a723669f85cb7d078c09d87ccb9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "5e7dc86c3b76fa7d074705012072118ab6cf017f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "80c0edea424ad7bbf4661a6d889b4e830600d4da",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8eb4ad71ade98af2e80de46ab1b0722b59efc67d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6187369e39bf4fc11704a49451906a7c634e9124",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "eed6fe87e0c033e5fc3a3886db1d5d3c7d783aa8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9ae55384a04106cb4c11c78deecc43eec4fbb17a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1a772ae0dfb6427f624042965cd8689ded2a9169",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b71c52ef21dd8dbee385ea1e7c3a9556d47fb098",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "441cc3b28b10105af2491a5475f6ac782bea1162",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8ecb7b378116982a7cdcecc5de397904d8d23760",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1f53f9f52acf3ffcb318a1aded40ca8c5e53fdf1",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "acb4ef06745bc2cf3b5f90b63ffc68c94f29a91e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "cc9096d0a1a03010b1870c9dc3afc0bd5626ec47",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e656a10a8550c36cd3bb01b4443e22bb419aa26d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "dc9df22396b7875b7cc3db53a36dca7a27e4fdad",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9642b018af68955aa1a0886ecf3b92687e864567",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "dbd7aaee2ea54bee680d1709b3cabc57bb11ce1f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "45f47ccb7df578a76d9e4e9965affaa51152714f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "dff684e2f320aa235c8faacfda50653a9d9da706",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6b43b628adf411f6a7e472f78a90d13b656e597c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "89123426b5c63d5d7d927fd6095191ca0e904c11",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d5ff85ae61504eaf45a560d9bf5ecc4dda360e87",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "40b584401f01e9fbc62a3586d661c7dceb2aee15",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "58d4e5146ac99135ec76b9b272c17912258124de",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "005397301ebd14130c1fdbe9126799cd34a1a789",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "159a80b80dbb990bb56f34ba46080e04c4857040",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "12e024cf1f5dced9dc1926a7b58ea05739fd04ae",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e34e8300744295965f52aeeb840518dd2bb5de61",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1a54b3e2cb38b7c2b567a5ef18508e0b1ab4019b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "35624f39be751f4bcb66c1c7034fe256bbc1ee60",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8df5a041fc173367b6a9f813919a49679896aa04",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a831b56523949f3f8b6ef18a94ad6ddcb8855291",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "99166ef4be6cea1ca30e24333a2a359d6b380219",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "12f9ccb3306f59572d02065d38a79899fbe3b46e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b25cdfd1aa821658616576d88cbda14c40dd8081",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6e3f585625ebf90b20ca4bdad482319d78c5c91b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "aaa45c32f01fb53458c5a039835257ed48ea0ee8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0b78b2a262b8b7bd64b08e20b8e1db000531c487",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a9e520d6d64e5a5c57b71d00c984c2c9abf49149",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c3db1cffdab168c16ab8be7c3184b13c53462cb3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "7f335fd7d8788a63bf1ea1fd16811a32ad0806bc",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ea5453bc68404b78984a316791937964ea6bc873",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1713f5007adac67110e99b102a583396085b88e2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fee75fd78c7b9f8845ea846e5a3152acdf6e86b7",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "b8d8da738b5c9c383ac45c95a76bf583f23ef319",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "30696b35f5be9b89ec4de794778f7bcd3cc1149a",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8bff1dbc32af47e691e94c34a3f00b11fce024ba",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "84a0de3ebc02381f1b2b86d526b3e67ba037eb1e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "361a5c47790d987e09e840fba08c7c69b36f6a83",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c73771253747bacfc11667ff26f5a8569541bf3f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "46002aafe8c12781abebf3f282a36c0b8f6594e9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "8ceda47b73c2d38199e3118bff16ece4d9192e11",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "71a2dadc3025925bfcd682ef58d0bde4e131d4e1",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1f0959268f7b50be59a2461c960282560a404396",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0a5a1b99eb14f342a57ee36ca47eca04614babc4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ef41a9d8e73a40ba7f4d9bf8f1b6a941d4047646",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c5ef36a9873a38ad37ae2e72062fe671dd50ad05",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6031c6fc8f9d70239538d6905bb0d7ba6ab62c99",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c437b85509ba73c6bba0ab1a2022a7f129a1ac77",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1b0186ef009684061067a2ee33d983135a2abbb0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "1d3654adf2f9e1e1a4c6477587f3fb0d84e1d611",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "ceaf341b8a944850e0c06456605318c5f74b6188",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "40659cef43b5fa43f3da3b9fd0e108d9908af7bb",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fa0d12df8558555e086ad4419004af677dcd7b3f",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "3cab968daf03f3528d14fc9a2a3e082ce2f0c22c",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c40de835fe324d8a43a7c8c14d715a590f4c0b5b",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "bf619e4cef49ac50f059cb63e0f1aed5aba044be",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "41c2c6e9d1abdd95a7f8943f71ce3b4f03c49ff7",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fb40ac11c03887bff0dfa73c6b198a8ca0169313",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "6d940f189adeaa0093fdfa40248800d22170b3ec",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "70ff0ea9a1eb6853e9ac2cb632dfdd32a12d5f83",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e793bc9e3343c01e362713528d0787a241175504",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "821164cb7163b15cde66c8633cf0dca35b2f8e82",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "436d4d63d7844047ffe330b4dc4da281b0e135a2",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9f0cfdb10fcfa296776554d2cf50944ee5c258a4",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "26c01e79ad6b51b54afce8a9e366e11f7f9d83b9",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9e77562bdb1c3467e2183942c6256c72a2925ee8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fce5d3efdc25a2138f0582c7fcad06b681e31dab",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "c95195caec5d422b09c8387bb4d5d1c48d4368ae",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "cf78ce35693cbbde55b0c3104fb607aefd93931e",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "d4ba1c675e025abaf81f2d75973b2ba1201373ef",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a56dd62389d103c7bf949151943fb0a92cbf22d3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "a00a62b24cbb4360dfa683835abf3f389eb5d3b0",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "4190b139f4b03f43876d32ac74a37c9aaa987d20",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "64b001ef89d5020e44e921b555b52de042d3c236",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "fee74ea9f61c684c27ccc3fe22526cd1633e76b3",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "9840e04e7e1981b9439c66f4c6e9c09c97e3edd6",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "f57196b599abd6925e746b919f00e3526754b7d7",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "664825f270c6c08eac8f5964a7bd5d9a9418e15d",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "e226c65ec0f1209418978417be0b0553abfcece8",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "88c76d879853ac5c32dc6df20b359070afc5f506",
+		"language": ["java"]
+	},
+	{
+		"repo_name": "apache/juddi",
+		"fix_commit_hash": "0d9e30a0aeea1d12d254baa85484b48f2249013e",
+		"language": ["java"]
+	}
+]

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<project name="Apache jUDDI">
+
+	<version position="right"/>
+	<bannerLeft>
+		<name>Apache jUDDI</name>
+		<src>images/logo.png</src>
+		<href>http://juddi.apache.org</href>
+	</bannerLeft>
+	<bannerRight>
+		<src>images/apache_feather.gif</src>
+	</bannerRight>
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.6</version>
+	</skin>
+
+	<publishDate format="dd MMM yyyy" position="right"/>
+	<custom>
+		<fluidoSkin>
+			<googleSearch>
+				<sitesearch/>
+			</googleSearch>
+			<sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+			<gitHub>
+				<projectId>apache/maven-skins</projectId>
+				<ribbonOrientation>right</ribbonOrientation>
+				<ribbonColor>black</ribbonColor>
+				<projectId>apache/juddi</projectId>
+			</gitHub>
+			<topBarEnabled>true</topBarEnabled>
+			<sideBarEnabled>true</sideBarEnabled>
+		</fluidoSkin>
+	</custom>
+
+
+	<body>
+		<breadcrumbs>
+			<item name="Apache" href="http://www.apache.org/"/>
+		</breadcrumbs>
+		<menu name="Apache jUDDI">
+			<item name="Welcome" href="index.html"/>
+			<item name="Live Demos" href="demos.html">
+				<item name="Prod UI" href="http://uddi-jbossoverlord.rhcloud.com/"/>
+				<item name="Prod SVC" href="http://uddi-jbossoverlord.rhcloud.com/juddiv3/"/>
+				<item name="Sandbox UI" href="http://uddiconsole-jbossoverlord.rhcloud.com/" />
+				<item name="Sandbox SVC" href="http://uddiconsole-jbossoverlord.rhcloud.com/juddiv3/"/>
+			</item>
+		</menu>
+		<menu name="Downloads">
+			<item name="Releases" href="releases.html"/>
+			<item name="Source Code" href="source-repository.html"/>
+		</menu>
+
+
+
+		<menu name="Documentation">
+			<item name="Supported UDDI Interfaces" href="uddi.html"/>
+			<item name="Security Advisories" href="security.html"/>
+			<item name="jUDDI Docs" href="docs.html"/>
+			<item name="Wiki" href="http://wiki.apache.org/juddi"/>
+			<item name="UDDI Library" href="library.html" />
+			<item name="Javadocs v2" href="apidocs2/index.html"/>
+			<item name="Javadocs v3" href="apidocs/index.html"/>
+			<item name="XRef v3" href="xref/index.html"/>
+			<item name="jUDDI Blog" href="http://apachejuddi.blogspot.com/" />
+		</menu>
+
+		<menu name="Subprojects">
+			<item name="Apache Scout" href="http://juddi.apache.org/scout/" />
+		</menu>
+		<menu name="Misc">
+			<item name="Participation" href="participation.html" />
+			<item name="Who We Are" href="who.html"/>
+			<item name="Committer Notes" href="committers.html" />
+			<item name="Sponsors" href="thanks.html"/>
+			<item name="Legal" href="legal.html" />
+			<item name="License" href="license.html" />
+		</menu>
+
+		<menu ref="parent" inherit="top"/>
+		<menu ref="modules" />
+		<menu ref="reports"  inherit="top"/>
+	</body>
+</project>
+

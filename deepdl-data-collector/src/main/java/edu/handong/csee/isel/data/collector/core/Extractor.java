@@ -44,7 +44,7 @@ public class Extractor {
         final String WINDOWS_FORMAT = 
                 "cmd.exe /c %s patch -i %s -o %s -ij -jk %s";
         final String LINUX_FORMAT = 
-                "sh -c %s patch -i %s -o %s -ij -jk %s";
+                "sh -c \"%s patch -i %s -o %s -ij -jk %s\"";
         
 		CommitHashReader reader;
         String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT; 
