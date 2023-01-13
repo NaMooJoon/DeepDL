@@ -54,7 +54,7 @@ public class Extractor {
 										"bin", "DPMiner.bat")
                 		  : String.join(fileSeparator, 
 							  			"..", "tools", "DPminer", 
-										"bin", "./DPMiner");
+										"bin", "DPMiner");
         String patchPath = String.join(fileSeparator, "out", "patch");
         String fileName = String.join(fileSeparator, 
                                       projectPath, "out", "bfc", 
