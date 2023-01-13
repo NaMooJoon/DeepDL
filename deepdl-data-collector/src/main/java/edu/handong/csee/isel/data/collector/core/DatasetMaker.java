@@ -17,14 +17,14 @@ import org.json.JSONArray;
 public class DatasetMaker {
 
     /**
-     * Makes clean snapshots with bfc before the splitting point and writes commit files and pinpointed buggy lines file with bfc after the splitting point.
+     * Makes clean snapshots with bfc before the splitting point and writes commit files with pinpointed buggy lines with bfc after the splitting point.
      * The commit files will be written at <code>projectPath</code>/out/test-data/commits.
      * The pinpointed buggy lines file will be written at <code>projectPath</code>/out/test-data/buggy-lines. 
      * @param commits the bfc commits and their corresponding bic commits
      * @param splittingPoint the splitting point
      */
     public void makeDataset(JSONArray commits, Date splittingPoint) {
-                
+        
 
     }
 

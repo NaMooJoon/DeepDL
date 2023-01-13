@@ -68,7 +68,7 @@ public class Extractor {
         String argument = String.join(" ", 
                                       DPMinerPath + "patch", 
                                       "-i", url, "-o", patchPath, 
-                                      "-ij", key);
+                                      "-ij", "-jk", key);
         String fileName = String.join(fileSeparator, 
                                       projectPath, "out", "bfc", 
 									  "bfc_" + repository + ".json"); 
