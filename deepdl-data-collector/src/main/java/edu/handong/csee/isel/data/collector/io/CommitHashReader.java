@@ -1,7 +1,6 @@
 package edu.handong.csee.isel.data.collector.io;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,10 +14,10 @@ import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 public class CommitHashReader {
     private static final String FIX_DATE_PATTERN = 
             "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
-    
+
     private BufferedReader in;
 
-    public CommitHashReader(File file) throws FileNotFoundException {
+    public CommitHashReader(String file) throws FileNotFoundException {
         in = new BufferedReader(new FileReader(file));
     }
 

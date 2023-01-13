@@ -17,11 +17,30 @@ import edu.handong.csee.isel.data.collector.util.Utils;
  * All of the exe file path for these programs should be in the environment path.
  */
 public class Extractor {
+    private String command;
+    private String option;
+    private String program;
     private String fileSeparator = System.getProperty("file.separator");
     private String projectPath = Utils.getProjectPath();
-    private boolean isWindows = System.getProperty("os.name")
-                                      .toLowerCase()
-                                      .startsWith("windows");
+    
+    /**
+     * Initializes the command and option for extracting BFC and BIC depends on the OS system.
+     */
+    public Extractor() {
+        boolean isWindows = System.getProperty("os.name")
+                                  .toLowerCase()
+                                  .startsWith("windows");
+        
+        if (isWindows) {
+            command = "cmd.exe";
+            option = "/c";
+            program = "DPMiner.bat";
+        } else {
+            command = "sh";
+            option = "-c";
+            program = "DPMiner";
+        }         
+    }
 
     /**
      * Extracts BFC of the given GitHub repository from [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
@@ -41,35 +60,27 @@ public class Extractor {
             			   String startDate, String endDate) 
                     				throws IOException, InterruptedException, 
                             		  	   FileFormatException {
-        final String WINDOWS_FORMAT = 
-                "cmd.exe /c %s patch -i %s -o %s -ij -jk %s";
-        final String LINUX_FORMAT = 
-                "sh -c \"%s patch -i %s -o %s -ij -jk %s\"";
-        
 		CommitHashReader reader;
-        String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT; 
-        String DPMinerPath = 
-				isWindows ? String.join(fileSeparator, 
-							  			"..", "tools", "DPminer", 
-										"bin", "DPMiner.bat")
-                		  : String.join(fileSeparator, 
-							  			"..", "tools", "DPminer", 
-										"bin", "DPMiner");
+        String DPMinerPath = String.join(fileSeparator, 
+							  			"..", "tools", 
+                                        "DPminer", "bin", program);
         String patchPath = String.join(fileSeparator, "out", "patch");
+        String argument = String.join(" ", 
+                                      DPMinerPath + "patch", 
+                                      "-i", url, "-o", patchPath, 
+                                      "-ij", key);
         String fileName = String.join(fileSeparator, 
                                       projectPath, "out", "bfc", 
 									  "bfc_" + repository + ".json"); 
-		Object[] args = new Object[] { DPMinerPath, url, 
-									   patchPath, key };  
         BFCWriter writer = new BFCWriter(fileName);
 	                    
-		execute(String.format(format, args), projectPath);
-		
+		execute(command, option, argument, projectPath);
+	
 		reader = 
-				new CommitHashReader(
-						new File(String.join(fileSeparator, 
-								 			 projectPath, patchPath), 
-								 "PATCH_" + repository + ".csv"));
+                new CommitHashReader(
+		                String.join(fileSeparator, 
+								 	projectPath, patchPath, 
+								    "PATCH_" + repository + ".csv"));
 		
         writer.writeBFC(repouser, repository, 
 						reader.readCommitHashes(repository, 
@@ -85,12 +96,6 @@ public class Extractor {
      * @throws InterruptedException
      */
     public void extractBIC(String repository) throws IOException, InterruptedException {
-        final String WINDOWS_FORMAT = 
-                "cmd.exe /c python %s %s %s %s";
-        final String LINUX_FORMAT = 
-                "sh -c python %s %s %s %s";
-        
-        String format = isWindows ? WINDOWS_FORMAT : LINUX_FORMAT;
         String PySZZPath = String.join(fileSeparator, 
                                        "..", "tools", "pyszz");
 		String mainPath = String.join(fileSeparator, PySZZPath, "main.py");
@@ -100,10 +105,12 @@ public class Extractor {
 		String ymlPath = String.join(fileSeparator, 
                                      PySZZPath, "conf", "raszz.yml");
         String repoPath = String.join(fileSeparator, "out", "snapshot");
+        String argument = String.join(" ", 
+                                      "python", mainPath, 
+                                      BFCPath, ymlPath, repoPath);
 		String outPath = String.join(fileSeparator, projectPath, "out");
         
-        execute(String.format(format, mainPath, BFCPath, ymlPath, repoPath), 
-                projectPath);    
+        execute(command, option, argument, projectPath);    
         Files.move(Path.of(outPath, 
                            new File(outPath).list(
                                 new FilenameFilter() {
@@ -118,16 +125,19 @@ public class Extractor {
     }
 
     /**
-     * Executes the given command in the subprocess.
+     * Executes the given command with the given option and argument in a subprocess.
      * @param command the command
+     * @param option the option
+     * @param argument the argument
      * @param dir the directory in which executes the command
      * @throws IOException
      * @throws InterruptedException
      */
-    private void execute(String command, String dir) 
-            throws IOException, InterruptedException {
+    private void execute(String command, String option, String argument, 
+                         String dir) 
+                                throws IOException, InterruptedException {
         Process child = Runtime.getRuntime()
-                               .exec(command, null, new File(dir));
+                               .exec(new String[] {command, option, argument}, null, new File(dir));
 
         child.waitFor();
     }    
