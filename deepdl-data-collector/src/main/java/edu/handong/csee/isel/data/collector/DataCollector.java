@@ -1,5 +1,6 @@
 package edu.handong.csee.isel.data.collector;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,9 +31,7 @@ public class DataCollector {
     public void collect() {
         final String END_DATE = "2021-11-30";
         final float TRAIN_RATIO = 0.6F;
-
-        String snapshotPath = String.join(fileSeparator,  
-                                          projectPath, "out", "snapshot");   
+ 
         List<String>[] resources = new List[4];
         RevCommit[] splittingCommits;
         int numRepositories;
@@ -43,18 +42,22 @@ public class DataCollector {
         splittingCommits = new RevCommit[numRepositories];
 
         try {
-            Files.createDirectory(Path.of(projectPath, "out", "bfc"));
-            Files.createDirectory(Path.of(projectPath, "out", "bic"));
+            Files.createDirectories(Path.of(projectPath, "out", "bfc"));
+            Files.createDirectories(Path.of(projectPath, "out", "bic"));
             
             for (int i = 0; i < numRepositories; i++) {
                 String repoPath = 
-                        String.join(fileSeparator, snapshotPath, 
+                        String.join(fileSeparator, 
+                                projectPath, "out", "snapshot", 
                                 resources[Resources.REPOUSER.ordinal()].get(i),
                                 resources[Resources.REPOSITORY.ordinal()]
                                 .get(i));
-                                
-                searcher.cloneRepository(
-                        resources[Resources.URL.ordinal()].get(i), repoPath);
+                
+                if (!Files.exists(Path.of(repoPath))) {
+                    searcher.cloneRepository(
+                            resources[Resources.URL.ordinal()].get(i), 
+                            repoPath);
+                }
                 searcher.changeRepository(
                         String.join(fileSeparator, repoPath, ".git"));
             

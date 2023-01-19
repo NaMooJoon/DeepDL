@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Class that makes dataset for DeepDL model.
@@ -17,32 +18,38 @@ import org.json.JSONArray;
 public class DatasetMaker {
 
     /**
-     * Makes clean snapshots with bfc before the splitting point and writes commit files with pinpointed buggy lines with bfc after the splitting point.
-     * The commit files will be written at <code>projectPath</code>/out/test-data/commits.
-     * The pinpointed buggy lines file will be written at <code>projectPath</code>/out/test-data/buggy-lines. 
-     * @param commits the bfc commits and their corresponding bic commits
+     * Makes clean snapshots of the given repository with bic before the given splitting point and writes commit JSON files of the given repository with bic after the given splitting point.
+     * The commit JSON files will be written at <code>projectPath</code>/out/test-data 
+     * @param repository the repository
      * @param splittingPoint the splitting point
      */
-    public void makeDataset(JSONArray commits, Date splittingPoint) {
+    public void makeDataset(String repository, Date splittingPoint) {
         
+
+
 
     }
 
     /**
-     * Removes the given buggy line from the given file. 
-     * @param filename filename
-     * @param buggyLine buggy line
+     * Removes the given line from the given file. 
+     * @param filename the filename
+     * @param line the line
      * @throws IOException 
      */
-    private void removeBuggyLine(String filename, String buggyLine) 
+    private void removeLine(String filename, String line) 
             throws IOException {
         List<String> lines = Files.readAllLines(Path.of(filename));
         BufferedWriter out = new BufferedWriter(new FileWriter(new File(filename)));
         
         for (int i = 0; i < lines.size(); i++) {
-            if (!lines.get(i).equals(buggyLine)) {
+            if (!lines.get(i).equals(line)) {
                 out.write(lines.get(i));
             }
         }
     } 
+
+    /**
+     * 
+     */
+    //private 
 }

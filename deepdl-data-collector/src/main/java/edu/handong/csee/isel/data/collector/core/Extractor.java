@@ -20,7 +20,6 @@ public class Extractor {
     private String command;
     private String option;
     private String program;
-    private String fileSeparator = System.getProperty("file.separator");
     private String projectPath = Utils.getProjectPath();
     
     /**
@@ -61,24 +60,24 @@ public class Extractor {
                     				throws IOException, InterruptedException, 
                             		  	   FileFormatException {
 		CommitHashReader reader;
-        String DPMinerPath = String.join(fileSeparator, 
+        String DPMinerPath = String.join(File.separator, 
 							  			"..", "tools", 
                                         "DPMiner", "bin", program);
-        String patchPath = String.join(fileSeparator, "out", "patch");
+        String patchPath = String.join(File.separator, "out", "patch");
         String argument = String.join(" ", 
-                                      DPMinerPath + "patch", 
+                                      DPMinerPath, "patch", 
                                       "-i", url, "-o", patchPath, 
                                       "-ij", "-jk", key);
-        String fileName = String.join(fileSeparator, 
+        String fileName = String.join(File.separator, 
                                       projectPath, "out", "bfc", 
 									  "bfc_" + repository + ".json"); 
         BFCWriter writer = new BFCWriter(fileName);
-	                    
+	    
 		execute(command, option, argument, projectPath);
 	
 		reader = 
                 new CommitHashReader(
-		                String.join(fileSeparator, 
+		                String.join(File.separator, 
 								 	projectPath, patchPath, 
 								    "PATCH_" + repository + ".csv"));
 		
@@ -96,19 +95,19 @@ public class Extractor {
      * @throws InterruptedException
      */
     public void extractBIC(String repository) throws IOException, InterruptedException {
-        String PySZZPath = String.join(fileSeparator, 
+        String PySZZPath = String.join(File.separator, 
                                        "..", "tools", "pyszz");
-		String mainPath = String.join(fileSeparator, PySZZPath, "main.py");
-        String BFCPath = String.join(fileSeparator, 
+		String mainPath = String.join(File.separator, PySZZPath, "main.py");
+        String BFCPath = String.join(File.separator, 
                                      "out", "bfc", 
                                      "bfc_" + repository + ".json");
-		String ymlPath = String.join(fileSeparator, 
+		String ymlPath = String.join(File.separator, 
                                      PySZZPath, "conf", "raszz.yml");
-        String repoPath = String.join(fileSeparator, "out", "snapshot");
+        String repoPath = String.join(File.separator, "out", "snapshot");
         String argument = String.join(" ", 
                                       "python", mainPath, 
                                       BFCPath, ymlPath, repoPath);
-		String outPath = String.join(fileSeparator, projectPath, "out");
+		String outPath = String.join(File.separator, projectPath, "out");
         
         execute(command, option, argument, projectPath);    
         Files.move(Path.of(outPath, 
@@ -137,7 +136,9 @@ public class Extractor {
                          String dir) 
                                 throws IOException, InterruptedException {
         Process child = Runtime.getRuntime()
-                               .exec(new String[] {command, option, argument}, null, new File(dir));
+                               .exec(new String[] {command, option, argument}, 
+                                     null, 
+                                     new File(dir));
 
         child.waitFor();
     }    
