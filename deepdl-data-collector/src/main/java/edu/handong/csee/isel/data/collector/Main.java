@@ -1,12 +1,31 @@
 package edu.handong.csee.isel.data.collector;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.Edit;
+import org.eclipse.jgit.diff.EditList;
+import org.eclipse.jgit.lib.Config;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
+
+import edu.handong.csee.isel.data.collector.util.Utils;
+
 public class Main {
     public static void main(String[] args) {
-        /*
+        
         try { 
-            
             Git git = Git.open(new File(Utils.getProjectPath(), 
-                               String.join(System.getProperty("file.separator"),
+                               String.join(File.separator,
                                            "..", ".git")));
             CanonicalTreeParser oldParser = new CanonicalTreeParser();
             
@@ -14,12 +33,13 @@ public class Main {
                             new RevWalk(git.getRepository())
                             .parseCommit(
                                     RevCommit.fromString(
-                                            "183b6199d6470aad0e85f645e063126de8a009b2"))
+                                            "22a1b41d47be5e6f9b5e3da7d621c93ac787d4f1"))
                             .getTree());
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             List<DiffEntry> entries = git.diff()
                                          .setOutputStream(out)
+                                         /** 
                                          .setOldTree(oldParser)
                                          .setNewTree(
                                                 new CanonicalTreeParser(
@@ -28,13 +48,25 @@ public class Main {
                                                         new RevWalk(git.getRepository())
                                                                 .parseCommit(
                                                                         RevCommit.fromString(
-                                                                                "a0eeca7006e52646a0cbc4d94912d1069b59854c"))
+                                                                                "414fc34653e1f14a3ad6781f524030f1216d0322"))
                                                                 .getTree()))
+                                            **/                       
                                          .call();
-            System.out.println(out.toString());
+            
+            System.out.println(new String(out.toByteArray()));
+
+            DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+
+            formatter.setReader(git.getRepository().newObjectReader(), new Config());
 
             for (DiffEntry entry : entries) {
-                System.out.println(entry.toString());
+                EditList edits = formatter.toFileHeader(entry).toEditList();
+                
+                for (Edit edit : edits) {
+                    System.out.printf("a: %d - %d\n", edit.getBeginA(), edit.getEndA());
+                    System.out.printf("b: %d - %d\n", edit.getBeginB(), edit.getEndB());
+                }
+                //System.out.println(entry.toString());
             }
             
         } catch (IOException e) {
@@ -42,8 +74,7 @@ public class Main {
         } catch (GitAPIException e) {
             e.printStackTrace();
         }   
-        */                      
-        //System.out.println(new Timestamp(new Date().getTime()).toString().replaceAll("-|\\s|:|\\.", ""));
-        new DataCollector().collect();
+        
+        //new DataCollector().collect();
     }
 }

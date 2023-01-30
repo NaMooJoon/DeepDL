@@ -31,7 +31,7 @@ public class Extractor {
                                   .startsWith("windows");
         
         if (isWindows) {
-            command = "cmd.exe";
+            command = "cmd.exe"; 
             option = "/c";
             program = "DPMiner.bat";
         } else {
@@ -75,11 +75,10 @@ public class Extractor {
 	    
 		execute(command, option, argument, projectPath);
 	
-		reader = 
-                new CommitHashReader(
-		                String.join(File.separator, 
-								 	projectPath, patchPath, 
-								    "PATCH_" + repository + ".csv"));
+		reader = new CommitHashReader(String.join(
+                        File.separator, 
+                        projectPath, patchPath, 
+						"PATCH_" + repository + ".csv"));
 		
         writer.writeBFC(repouser, repository, 
 						reader.readCommitHashes(repository, 
@@ -95,14 +94,15 @@ public class Extractor {
      * @throws InterruptedException
      */
     public void extractBIC(String repository) throws IOException, InterruptedException {
-        String PySZZPath = String.join(File.separator, 
-                                       "..", "tools", "pyszz");
-		String mainPath = String.join(File.separator, PySZZPath, "main.py");
+		String mainPath = String.join(File.separator, 
+                                      "..", "tools", "pyszz", 
+                                      "main.py");
         String BFCPath = String.join(File.separator, 
                                      "out", "bfc", 
                                      "bfc_" + repository + ".json");
 		String ymlPath = String.join(File.separator, 
-                                     PySZZPath, "conf", "raszz.yml");
+                                     "..", "tools", "pyszz", 
+                                     "conf", "raszz.yml");
         String repoPath = String.join(File.separator, "out", "snapshot");
         String argument = String.join(" ", 
                                       "python", mainPath, 
@@ -139,7 +139,7 @@ public class Extractor {
                                .exec(new String[] {command, option, argument}, 
                                      null, 
                                      new File(dir));
-
+                                     
         child.waitFor();
     }    
 }
