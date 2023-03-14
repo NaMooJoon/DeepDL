@@ -88,18 +88,19 @@ public class Extractor {
     }
 
     /**
-     * Extracts BIC and writes it in json file using PySZZ.
+     * Extracts BIC of the given repository and writes it in JSON file by using PySZZ.
      * The file will be written in <code>projectPath</code>/out.
+     * @param reponame the name of the repository
      * @throws IOException
      * @throws InterruptedException
      */
-    public void extractBIC(String repository) throws IOException, InterruptedException {
+    public void extractBIC(String reponame) throws IOException, InterruptedException {
 		String mainPath = String.join(File.separator, 
                                       "..", "tools", "pyszz", 
                                       "main.py");
         String BFCPath = String.join(File.separator, 
                                      "out", "bfc", 
-                                     "bfc_" + repository + ".json");
+                                     "bfc_" + reponame + ".json");
 		String ymlPath = String.join(File.separator, 
                                      "..", "tools", "pyszz", 
                                      "conf", "raszz.yml");
@@ -120,7 +121,7 @@ public class Extractor {
                                                 "bic_ra_\\d+.json");  
                                     }
                                 })[0]),  
-				   Path.of(outPath, "bic", "bic_" + repository + ".json"));
+				   Path.of(outPath, "bic", "bic_" + reponame + ".json"));
     }
 
     /**
@@ -133,7 +134,7 @@ public class Extractor {
      * @throws InterruptedException
      */
     private void execute(String command, String option, String argument, 
-                         String dir) 
+                        String dir) 
                                 throws IOException, InterruptedException {
         Process child = Runtime.getRuntime()
                                .exec(new String[] {command, option, argument}, 

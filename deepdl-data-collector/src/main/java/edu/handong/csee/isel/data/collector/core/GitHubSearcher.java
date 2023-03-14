@@ -22,8 +22,9 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 /**
  * Class that gets data from GitHub. 
  */
-public class GitHubSearcher {
+public class GitHubSearcher implements AutoCloseable {
     private Git git;
+    private String repouser;
 
     /**
      * Clones the repository to the given directory.
@@ -57,27 +58,38 @@ public class GitHubSearcher {
     public String[] diffCommits(RevCommit oldCommit, RevCommit newCommit) 
             throws GitAPIException, IncorrectObjectTypeException, 
                    MissingObjectException, IOException { 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectReader or = git.getRepository().newObjectReader();
-        RevWalk revWalk = new RevWalk(or);
-
-        git.diff()
-           .setOutputStream(out)
-           .setOldTree(new CanonicalTreeParser(
-                    null, 
-                    or, 
-                    oldCommit.getTree()))
-           .setNewTree(new CanonicalTreeParser( 
-                    null, 
-                    or,
-                    newCommit.getTree()))
-          .call();
-        or.close();
-        revWalk.close();
-       
-        return out.toString().split("\n");
+        
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+             ObjectReader or = git.getRepository().newObjectReader()) {
+            git.diff()
+               .setOutputStream(out)
+               .setOldTree(new CanonicalTreeParser(null, 
+                                                   or, 
+                                                   oldCommit.getTree()))
+               .setNewTree(new CanonicalTreeParser(null, 
+                                                   or,
+                                                   newCommit.getTree()))
+               .call();
+          
+            return out.toString().split("\n");
+        }
     }   
-     
+    
+    /**
+     * Checkout to the snapshot of this instance's repository.
+     * The snapshot of the project refers to the latest commit state before the splitted commit.
+     * @param splittedCommit the splitted commit
+     * @throws GitAPIException 
+     */
+    public void checkoutToSnapshot(RevCommit splittedCommit) 
+            throws GitAPIException {
+        git.checkout()
+           .setCreateBranch(true)
+           .setName("snapshot")
+           .setStartPoint(splittedCommit.getParents()[0])
+           .call();
+    }
+
     /**
      * Gets splitting commit from this instance's repository.
      * The splitting commit splits this instance's repository's commits from [<code>startDate</code>, <code>endDate</code>) in ratio of <code>trainRatio</code> : 1 - <code>trainRatio</code>.
@@ -113,21 +125,6 @@ public class GitHubSearcher {
     }
 
     /**
-     * Checkout to the snapshot of this instance's repository.
-     * The snapshot of the project refers to the latest commit state before the splitted commit.
-     * @param splittedCommit the splitted commit
-     * @throws GitAPIException 
-     */
-    public void checkoutToSnapshot(RevCommit splittedCommit) 
-            throws GitAPIException {
-        git.checkout()
-           .setCreateBranch(true)
-           .setName("snapshot")
-           .setStartPoint(splittedCommit.getParents()[0])
-           .call();
-    }
-
-    /**
      * Converts the given commit hash into the <code>RevCommit</code> instance.
      * The given commit hash should be in this instance's object database.
      * @param hash the commit hash
@@ -139,11 +136,9 @@ public class GitHubSearcher {
     public RevCommit convertHashToCommit(String hash) 
             throws MissingObjectException, IncorrectObjectTypeException, 
                    IOException {
-        RevWalk revWalk = new RevWalk(git.getRepository());
-        RevCommit commit = revWalk.parseCommit(RevCommit.fromString(hash));        
-        revWalk.close();
-
-        return commit;
+        try (RevWalk revWalk = new RevWalk(git.getRepository())) {
+            return revWalk.parseCommit(RevCommit.fromString(hash));  
+        }
     }
 
     /**
@@ -179,10 +174,12 @@ public class GitHubSearcher {
         git = Git.open(new File(gitDir));
     }
 
-    /**
-     * Closes this instance.
-     */
+    @Override
     public void close() {
         git.close();
+    }
+
+    public String getRepouser() {
+        return repouser;
     }
 }

@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * Wrtier that writes bfc properties in PySZZ json format.
+ * Writer that writes bfc properties in PySZZ json format.
 */
 public class BFCWriter {
     private static final String LANGUAGE = "java";
