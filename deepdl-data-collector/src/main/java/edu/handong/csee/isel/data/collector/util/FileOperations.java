@@ -13,50 +13,34 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class FileOperations {
     
     /**
-     * Copies <code>src</code> directory into <code>dst</code> directory with all of its entries.
-     * @param dst destination path
-     * @param src source path
-     */
-    public static void copyDirectory(Path dst, Path src) {
-        try {
-            Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
-                private int srcNameCount = src.getNameCount();
-
-                @Override 
-                public FileVisitResult preVisitDirectory(Path dir, 
-                        BasicFileAttributes attrs) throws IOException {
-                    Files.createDirectory(dst.resolve(dir.subpath(
-                            srcNameCount - 1, dir.getNameCount())));
-                  
-                    return FileVisitResult.CONTINUE;    
-                }
-
-                @Override 
-                public FileVisitResult visitFile(Path file, 
-                        BasicFileAttributes attrs) throws IOException {
-                    Files.copy(file, dst.resolve(file.subpath(
-                            srcNameCount - 1, file.getNameCount())));
-                    
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Unpacks all of the entries of the given directory.
+     * Unpacks all of the given extension files and removes the other files of the given directory.
      * @param dir the directory
+     * @param extension the extension
+     * @throws IOException
      */
-    public static void unpack(Path dir) {
-     
-    
+    public static void unpack(Path dir, String extension) throws IOException {
+        Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+            
+            @Override 
+            public FileVisitResult visitFile(Path file, 
+                                             BasicFileAttributes attrs) 
+                                                    throws IOException {
+                if (file.getFileName().toString().endsWith("." + extension)) {
+                    Files.move(file, dir.resolve(file.getFileName()));
+                } else {
+                    Files.delete(file);
+                }
 
+                return FileVisitResult.CONTINUE;
+            }
+                                                     
+            @Override 
+            public FileVisitResult postVisitDirectory(Path dir, 
+                    IOException exc) throws IOException {
+                Files.delete(dir);
 
-    }
-
-    public static void clean(Path dir, String remain) {
-
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
