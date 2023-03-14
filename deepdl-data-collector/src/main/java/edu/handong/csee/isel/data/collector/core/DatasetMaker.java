@@ -1,21 +1,39 @@
 package edu.handong.csee.isel.data.collector.core;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVFormat.Builder;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.MissingObjectException;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import edu.handong.csee.isel.data.collector.util.Utils;
 
 /**
  * Class that makes dataset for DeepDL model.
  */
 public class DatasetMaker {
-    private final int FILE_BEGIN_INDEX = 6;
-    private final int LINE_BEGIN_INDEX = 1;
+    public static final int CENTRAL_LINE = 3;
+    public static final int FILE_BEGIN_INDEX = 6;
+    public static final int LINE_BEGIN_INDEX = 1;
 
     private GitHubSearcher searcher;
 
@@ -27,39 +45,183 @@ public class DatasetMaker {
     }
 
     /**
-     * Makes clean snapshots of the given repository with BIC before the given splitting point and writes commit JSON files with pinpointed buggy lines of the given repository with BIC after the given splitting point.
-     * The files in the <code>projectPath</code>/out/snapshot will be modified to make clean clean snapshots.
-     * The commit JSON files will be written at <code>projectPath</code>/out/test-data. 
+     * Makes clean snapshots of the current repository by using BIC before the given splitting point 
+     * and writes BIC files with pinpointed buggy lines of the current repository by using BIC after the given splitting point.<p>
+     * The files in the <code>projectPath</code>/out/snapshot is modified to make clean snapshots.<p>
+     * The BIC files with pinpointed buggy lines is written at <code>projectPath</code>/out/test-data. 
+     * @param reponmae name of the current repository
      * @param splittingPoint the splitting point
+     * @throws MissingObjectException
+     * @throws IOException
+     * @throws GitAPIException
      */
-    public void makeDataset(Date splittingPoint) {
-        
+    public void makeDataset(String reponame, Date splittingPoint) 
+            throws MissingObjectException, IOException, GitAPIException {
+        JSONArray ja = 
+                new JSONArray(
+                        Files.readAllLines(
+                                Path.of(Utils.getProjectPath(), 
+                                        "out", "bic", 
+                                        "bic_" + reponame + ".json"))
+                        .get(0));
+        HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> 
+                records = new HashMap<>();
 
+        for (Object o : ja) {
+            JSONObject jo = (JSONObject) o; 
+            HashMap<String, ArrayList<String>> removedLines = 
+                    getRemovedLines(jo.getString("fix_commit_hash"));
+            
+            for (Object p : jo.getJSONArray("inducing_commit_hash")) {
+                String hash = (String) p;
 
+                if (searcher.convertHashToCommit(hash)
+                            .getAuthorIdent()
+                            .getWhen()
+                            .after(splittingPoint)) {
+                    if (records.containsKey(hash)) {
+                        updateRecords(records.get(hash), removedLines);
+                    } else {
+                        records.put(hash, 
+                                makeRecords(getAddedAndMaintainedLines(hash), 
+                                            removedLines));
+                    }
+                } else {
+                    makeCleanSnapshot(getBuggyLines(getAddedLines(hash), 
+                                                    removedLines));
+                }
+            }
+        }
+
+        for (Entry<String, HashMap<String, ArrayList<ArrayList<Object>>>> entry
+                : records.entrySet()) {
+            saveBICWithPinpointedBuggyLines(entry.getKey(), entry.getValue());
+        }        
     }
 
     /**
-     * Makes clean snapshot by using the BIC and BFC from the given JSON object. 
-     * The files in the <code>projectPath</code>/out/snapshot will be modified.
-     * @param jo the JSON object
+     * Removes given buggy lines from the snapshots.
+     * The files in the <code>projectPath</code>/out/snapshot is modified.
+     * @param buggyLines the buggy lines
+     * @throws FileNotFoundException
+     * @throws IOException
      */
-    private void makeCleanSnapshot(JSONObject jo) {
-        
+    private void makeCleanSnapshot(
+            HashMap<String, ArrayList<String>> buggyLines) 
+                    throws FileNotFoundException, IOException { 
+        for (String key : buggyLines.keySet()) {
+            removeBuggyLines(String.join(File.separator, 
+                                         Utils.getProjectPath(), 
+                                         "out", "snapshot", 
+                                         searcher.getRepouser(), key), 
+                             buggyLines.get(key));
+        }
     }
 
     /**
-     * Writes BIC with pinpointed buggy lines in JSON format by using the BIC and BFC from the given JSON object.
-     * The file will be written at <code>projectPath</code>/out/test-data.
-     * @param jo the JSON object
+     * Makes records with the given added and maintained lines of BIC and removed lines of BFC.
+     * @param addedAndMaintainedLines the added and maintained lines
+     * @param removedLines the removed lines
+     * @return records which are classified by files
      */
-    private void saveBICWithPinpointedBuggyLines(JSONObject jo) {
+    private HashMap<String, ArrayList<ArrayList<Object>>> makeRecords(
+            HashMap<String, ArrayList<String>> addedAndMaintainedLines,
+            HashMap<String, ArrayList<String>> removedLines) {        
+        HashMap<String, ArrayList<ArrayList<Object>>> records = new HashMap<>();
 
+        for (String key : addedAndMaintainedLines.keySet()) {
+            ArrayList<String> addedAndMaintainedList = 
+                    addedAndMaintainedLines.get(key);
+            ArrayList<String> removedList = removedLines.containsKey(key) 
+                    ? removedLines.get(key) 
+                    : null;
+            ArrayList<ArrayList<Object>> recordList = new ArrayList<>();
+            
+            for (int i = 0; i < addedAndMaintainedList.size(); i++) {
+                if (addedAndMaintainedList.get(i).startsWith("+")) {
+                    ArrayList<Object> record = new ArrayList<>();
+
+                    record.add(key);
+
+                    for (int j = i - 2; j <= i + 2; j++) {
+                        record.add(j < 0 ? ""
+                                         : addedAndMaintainedList.get(j)
+                                                .substring(LINE_BEGIN_INDEX));
+                    }
+
+                    record.add(removedList == null 
+                            ? false 
+                            : removedList.contains(record.get(CENTRAL_LINE)));
+                    recordList.add(record);
+                }   
+            }
+            
+            if (!recordList.isEmpty()) {
+                records.put(key, recordList);
+            }
+        }
+        
+        return records;    
+    }
+    
+    /**
+     * Updates the given records by comparing central line with the given removed lines of BFC.
+     * @param records the records
+     * @param removedLines the removed lines
+     */
+    private void updateRecords(
+            HashMap<String, ArrayList<ArrayList<Object>>> records, 
+            HashMap<String, ArrayList<String>> removedLines) {
+        final int LABEL = 6;
+
+        for (String key : records.keySet()) {
+            if (removedLines.containsKey(key)) {
+                ArrayList<ArrayList<Object>> recordList = records.get(key);
+                ArrayList<String> removedList = removedLines.get(key);
+
+                for (ArrayList<Object> record : recordList) {
+                    if (removedList.contains((String) record.get(CENTRAL_LINE))) {
+                        record.set(LABEL, true);    
+                    }
+                }
+            }
+        }
+    }
+
+     /**
+      * Writes BIC with pinpointed buggy lines in CSV format.<p>
+      * The file is written at <code>projectPath</code>/out/test-data.
+      * @param bic BIC hash
+      * @param records records
+      * @throws IOException
+      */
+    private void saveBICWithPinpointedBuggyLines(String bic,
+            HashMap<String, ArrayList<ArrayList<Object>>> records) 
+                    throws IOException {
+        try (CSVPrinter printer = new CSVPrinter(
+                new FileWriter(new File(String.join(File.separator, 
+                                                    Utils.getProjectPath(), 
+                                                    "out", "test-data", 
+                                                    bic + ".csv"))), 
+                Builder.create(CSVFormat.DEFAULT)
+                       .setHeader("Filename", 
+                                  "Line1", "Line2", "Line3", 
+                                  "Line4", "Line5", 
+                                  "Buggy")
+                       .build())) {
+            for (ArrayList<ArrayList<Object>> val : records.values()) {
+                for (ArrayList<Object> record : val) {
+                    printer.printRecords(record);
+                }
+            }
+        }
     }
 
     /**
      * Gets added lines of the given commit hash.
+     * '+' in front of the added lines is deleted.
      * @param hash the commit hash
-     * @return added lines of the given commit which is classified by files
+     * @return added lines of the given commit which are classified by files
      * @throws GitAPIException 
      * @throws MissingObjectException
      * @throws IOException
@@ -67,27 +229,39 @@ public class DatasetMaker {
     private HashMap<String, ArrayList<String>> getAddedLines(String hash) 
             throws GitAPIException, MissingObjectException, IOException {
         String[] lines = searcher.diffCommits(
-                                searcher.convertHashToPreviousCommit(hash),
-                                searcher.convertHashToCommit(hash));
-        String file = null;                 
+                searcher.convertHashToPreviousCommit(hash),
+                searcher.convertHashToCommit(hash));
+        String filename = null;
+        ArrayList<String> addedList = new ArrayList<>();                  
         HashMap<String, ArrayList<String>> addedLines = new HashMap<>(); 
 
         for (String line : lines) {
-            if (line.startsWith("+++ b/")) {
-                file = line.substring(FILE_BEGIN_INDEX);
+            if (line.startsWith("diff")) {
+                if (!addedList.isEmpty()) {
+                    addedLines.put(filename, addedList);
 
-                addedLines.put(file, new ArrayList<String>());
+                    addedList = new ArrayList<>();
+                }
+            } else if (line.startsWith("+++")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
             } else if (line.startsWith("+")) {
-                addedLines.get(file).add(line.substring(LINE_BEGIN_INDEX));
+                addedList.add(line.substring(LINE_BEGIN_INDEX));
             }
         }
+
+        if (!addedList.isEmpty()) {
+            addedLines.put(filename, addedList);
+        }
+
         return addedLines;
     }
 
     /**
-     * Gets removed lines of the given commit.
-     * @param commit the commit
-     * @return removed lines of the given commit which is classified by files
+     * Gets removed lines of the given commit.<p>
+     * '-' in front of the removed lines is deleted.<p>
+     * The file does not added to the return value if the file does not contain at least one removed line. 
+     * @param commit the commit hash
+     * @return removed lines of the given commit which are classified by files
      * @throws GitAPIException
      * @throws MissingObjectException
      * @throws IOException
@@ -95,28 +269,82 @@ public class DatasetMaker {
     private HashMap<String, ArrayList<String>> getRemovedLines(String hash) 
             throws GitAPIException, MissingObjectException, IOException {
         String[] lines = searcher.diffCommits(
-                                searcher.convertHashToPreviousCommit(hash), 
-                                searcher.convertHashToCommit(hash));
-        String file = null;                 
+                searcher.convertHashToPreviousCommit(hash), 
+                searcher.convertHashToCommit(hash));              
+        String filename = null;   
+        ArrayList<String> removedList = new ArrayList<>();
         HashMap<String, ArrayList<String>> removedLines = new HashMap<>(); 
 
         for (String line : lines) {
-            if (line.startsWith("--- a/")) {
-                file = line.substring(FILE_BEGIN_INDEX);
-
-                removedLines.put(file, new ArrayList<String>());
+            if (line.startsWith("diff")) {
+                if (!removedList.isEmpty()) {
+                    removedLines.put(filename, removedList);
+                    
+                    removedList = new ArrayList<>();
+                }
+            } else if (line.startsWith("---")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
             } else if (line.startsWith("-")) {
-                removedLines.get(file).add(line.substring(LINE_BEGIN_INDEX));
+                removedList.add(line.substring(LINE_BEGIN_INDEX));
             }
         }
+
+        if (!removedList.isEmpty()) {
+            removedLines.put(filename, removedList);
+        }
+
         return removedLines;
+    }
+
+    /**
+     * Gets added and maintained lines of the given commit.<p>
+     * '+' in front of the added lines is not deleted.<p>
+     * ' ' in front of the maintained line is not deleted.<p>
+     * The file does not added to the return value if the file does not contain at least one added or maintained line. 
+     * @param hash the commit hash
+     * @return added and maintained lines of the given commit which are classified by files
+     * @throws GitAPIException
+     * @throws MissingObjectException
+     * @throws IOException
+     */
+    private HashMap<String, ArrayList<String>> getAddedAndMaintainedLines(
+            String hash) throws GitAPIException, MissingObjectException, 
+                                IOException {
+        String[] lines = searcher.diffCommits(
+            searcher.convertHashToPreviousCommit(hash), 
+            searcher.convertHashToCommit(hash));              
+        String filename = null;   
+        ArrayList<String> addedAndMaintainedList = new ArrayList<>();
+        HashMap<String, ArrayList<String>> addedAndMaintainedLines 
+                = new HashMap<>(); 
+
+        for (String line : lines) {
+            if (line.startsWith("diff")) {
+                if (!addedAndMaintainedList.isEmpty()) {
+                    addedAndMaintainedLines.put(filename, 
+                                                addedAndMaintainedList);
+                    
+                    addedAndMaintainedList = new ArrayList<>();
+                }
+            } else if (line.startsWith("---")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
+            } else if (line.startsWith("+") || line.startsWith(" ")) {
+                addedAndMaintainedList.add(line);
+            }
+        }
+
+        if (!addedAndMaintainedList.isEmpty()) {
+            addedAndMaintainedLines.put(filename, addedAndMaintainedList);
+        }
+
+        return addedAndMaintainedLines;
     }
 
     /**
      * Gets buggy lines by comparing the given added lines and removed lines.
      * @param addedLines the added lines
      * @param removedLines the removed lines
-     * @return buggy lines which is classified by files
+     * @return buggy lines which are classified by files
      */
     private HashMap<String, ArrayList<String>> getBuggyLines(
             HashMap<String, ArrayList<String>> addedLines, 
@@ -125,37 +353,60 @@ public class DatasetMaker {
         HashMap<String, ArrayList<String>> buggyLines = new HashMap<>();
         
         for (String key : keys) {
-            ArrayList<String> removedVal = removedLines.get(key);
-
-            if (removedVal != null) {
-                ArrayList<String> addedVal = addedLines.get(key);
-                ArrayList<String> buggyVal = new ArrayList<>();
+            if (removedLines.containsKey(key)) {
+                ArrayList<String> addedList = addedLines.get(key);
+                ArrayList<String> removedList = removedLines.get(key);
+                ArrayList<String> buggyList = new ArrayList<>();
                 
-                for (String addedLine : addedVal) {
-                    for (String removedLine : removedVal) {
-                        if (removedLine.equals(addedLine)) {
-                            buggyVal.add(addedLine);
-
-                            break;
-                        }
+                for (String addedLine : addedList) {
+                    if (removedList.contains(addedLine)) {
+                        buggyList.add(addedLine);
                     }
                 }
-                buggyLines.put(key, buggyVal);
+
+                if (!buggyList.isEmpty()) {
+                    buggyLines.put(key, buggyList);
+                }
             }
         }
+
         return buggyLines;
     } 
 
     /**
-     * Removes the given buggy lines from the given file.
-     * @param file the file
+     * Removes the given buggy lines from the file of the given path name.
+     * @param pathname the absolute path name 
      * @param buggyLines the buggy lines
+     * @throws FileNotFoundException
+     * @throws IOException
      */
-    private void removeBuggyLines(String file, ArrayList<String> buggyLines) {
+    private void removeBuggyLines(String pathname, 
+                                  ArrayList<String> buggyLines) 
+                                        throws FileNotFoundException, 
+                                               IOException {
+        File file = new File(pathname);
         
+        try (    
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        ) { 
+            String line;
+            int numWritten = 0;
 
+            while ((line = reader.readLine()) != null) {
+                if (!buggyLines.contains(line)) {
+                    writer.write(line);
+                    writer.newLine();
 
+                    numWritten++;
 
-
+                    if (numWritten == 20) {
+                        writer.flush();
+                        
+                        numWritten = 0;
+                    }
+                }
+            }
+        }
     }
 }
