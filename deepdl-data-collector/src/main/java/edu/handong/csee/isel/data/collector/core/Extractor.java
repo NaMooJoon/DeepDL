@@ -3,6 +3,7 @@ package edu.handong.csee.isel.data.collector.core;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -140,8 +141,31 @@ public class Extractor {
                                .exec(new String[] {command, option, argument}, 
                                      null, 
                                      new File(dir));
-                                     
-        child.waitFor();
+        
+        flushWaitFor(child);
     }    
+
+    /**
+     * Flushes the given process' input stream and error stream.<p>
+     * If the process has not yet terminated, the calling thread will be blocked until the process exits.
+     * @param p the process 
+     * @return exit value of the process
+     */
+    private int flushWaitFor(Process p) throws IOException {
+        InputStream is = p.getInputStream();
+        InputStream es = p.getErrorStream();
+
+        while (p.isAlive()) {
+            if (is.available() > 0) {
+                is.readAllBytes();
+            }
+
+            if (es.available() > 0) {
+                es.readAllBytes();
+            }
+        }
+
+        return p.exitValue();
+    }
 }
 

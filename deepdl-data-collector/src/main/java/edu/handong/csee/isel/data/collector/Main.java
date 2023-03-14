@@ -33,8 +33,7 @@ public class Main {
                     Runtime.getRuntime().exec(
                             new String[] {"cmd.exe", "/c", argument}, 
                             null, 
-                            new File(Utils.getProjectPath()));
-                                
+                            new File(Utils.getProjectPath()));                    
             child.waitFor();
             /** 
             Files.move(Path.of(outPath, 

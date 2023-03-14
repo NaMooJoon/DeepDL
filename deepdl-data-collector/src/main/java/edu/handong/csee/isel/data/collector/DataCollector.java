@@ -42,6 +42,7 @@ public class DataCollector {
 
             Files.createDirectories(Path.of(projectPath, "out", "bfc"));
             Files.createDirectories(Path.of(projectPath, "out", "bic"));
+            Files.createDirectories(Path.of(projectPath, "out", "test-data"));
             
             for (int i = 0; i < numRepositories; i++) {
                 RevCommit splittingCommit;
