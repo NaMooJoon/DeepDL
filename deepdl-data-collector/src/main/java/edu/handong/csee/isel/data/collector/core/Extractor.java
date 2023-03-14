@@ -108,7 +108,7 @@ public class Extractor {
                                      "conf", "raszz.yml");
         String repoPath = String.join(File.separator, "out", "snapshot");
         String argument = String.join(" ", 
-                                      "python", mainPath, 
+                                      "python3", mainPath, 
                                       BFCPath, ymlPath, repoPath);
 		String outPath = String.join(File.separator, projectPath, "out");
         
