@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.io.CommitHashReader;
@@ -157,11 +158,11 @@ public class Extractor {
 
         while (p.isAlive()) {
             if (is.available() > 0) {
-                is.readAllBytes();
+                System.out.println(Arrays.toString(is.readAllBytes()));
             }
 
             if (es.available() > 0) {
-                es.readAllBytes();
+                System.out.println(Arrays.toString(es.readAllBytes()));
             }
         }
 
