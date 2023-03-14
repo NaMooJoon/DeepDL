@@ -158,11 +158,11 @@ public class Extractor {
 
         while (p.isAlive()) {
             if (is.available() > 0) {
-                System.out.println(Arrays.toString(is.readAllBytes()));
+                System.out.println(new String(is.readAllBytes()));
             }
 
             if (es.available() > 0) {
-                System.out.println(Arrays.toString(es.readAllBytes()));
+                System.out.println(new String(es.readAllBytes()));
             }
         }
 
