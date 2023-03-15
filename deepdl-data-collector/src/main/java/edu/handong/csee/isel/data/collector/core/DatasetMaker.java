@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -57,13 +58,10 @@ public class DatasetMaker {
      */
     public void makeDataset(String reponame, Date splittingPoint) 
             throws MissingObjectException, IOException, GitAPIException {
-        JSONArray ja = 
-                new JSONArray(
-                        Files.readAllLines(
-                                Path.of(Utils.getProjectPath(), 
-                                        "out", "bic", 
-                                        "bic_" + reponame + ".json"))
-                        .get(0));
+        JSONArray ja = new JSONArray(
+                Files.readAllLines(Path.of(Utils.getProjectPath(), 
+                                   "out", "bic", "bic_" + reponame + ".json"))
+                .get(0));
         HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> 
                 records = new HashMap<>();
 
@@ -384,27 +382,41 @@ public class DatasetMaker {
                                   ArrayList<String> buggyLines) 
                                         throws FileNotFoundException, 
                                                IOException {
+        final int THRESHOLD = 100;
+                                                
         File file = new File(pathname);
-        
-        try (    
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        ) { 
-            String line;
-            int numWritten = 0;
 
+        if (!file.exists()) {
+            return;
+        }
+
+        ArrayList<String> lines = new ArrayList<>();
+        
+        try (BufferedReader reader = 
+                new BufferedReader(new FileReader(file))) {
+            String line;
+           
             while ((line = reader.readLine()) != null) {
                 if (!buggyLines.contains(line)) {
-                    writer.write(line);
-                    writer.newLine();
+                    lines.add(line);
+                }
+            }
+        }
 
-                    numWritten++;
+        try (BufferedWriter writer = 
+                new BufferedWriter(new FileWriter(file))) {
+            int numWritten = 0;
+            
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
 
-                    if (numWritten == 20) {
-                        writer.flush();
-                        
-                        numWritten = 0;
-                    }
+                numWritten++;
+
+                if (numWritten == THRESHOLD) {
+                    writer.flush();
+
+                    numWritten = 0;
                 }
             }
         }
