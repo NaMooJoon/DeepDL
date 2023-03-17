@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public class DatasetMaker {
         for (Object o : ja) {
             JSONObject jo = (JSONObject) o; 
             HashMap<String, ArrayList<String>> removedLines = 
-                    getRemovedLines(jo.getString("fix_commit_hash"));
+                    getRemovedLines(jo.getString("fix_commit_hash"), "java");
             
             for (Object p : jo.getJSONArray("inducing_commit_hash")) {
                 String hash = (String) p;
@@ -80,20 +79,21 @@ public class DatasetMaker {
                     if (records.containsKey(hash)) {
                         updateRecords(records.get(hash), removedLines);
                     } else {
-                        records.put(hash, 
-                                makeRecords(getAddedAndMaintainedLines(hash), 
-                                            removedLines));
+                        records.put(hash, makeRecords(
+                                getAddedAndMaintainedLines(hash, "java"), 
+                                removedLines));
                     }
                 } else {
-                    makeCleanSnapshot(getBuggyLines(getAddedLines(hash), 
-                                                    removedLines));
+                    makeCleanSnapshot(getBuggyLines(
+                            getAddedLines(hash, "java"), 
+                            removedLines));
                 }
             }
         }
 
         for (Entry<String, HashMap<String, ArrayList<ArrayList<Object>>>> entry
                 : records.entrySet()) {
-            saveBICWithPinpointedBuggyLines(entry.getKey(), entry.getValue());
+            saveBICWithPinpointedBuggyLines(reponame, entry.getKey(), entry.getValue());
         }        
     }
 
@@ -140,11 +140,14 @@ public class DatasetMaker {
                     ArrayList<Object> record = new ArrayList<>();
 
                     record.add(key);
-
+                    
                     for (int j = i - 2; j <= i + 2; j++) {
-                        record.add(j < 0 ? ""
-                                         : addedAndMaintainedList.get(j)
-                                                .substring(LINE_BEGIN_INDEX));
+                        if (j < 0 || j > addedAndMaintainedList.size() - 1) {
+                            record.add("");
+                        } else {
+                            record.add(addedAndMaintainedList.get(j)
+                                    .substring(LINE_BEGIN_INDEX));
+                        }
                     }
 
                     record.add(removedList == null 
@@ -186,20 +189,23 @@ public class DatasetMaker {
         }
     }
 
-     /**
-      * Writes BIC with pinpointed buggy lines in CSV format.<p>
-      * The file is written at <code>projectPath</code>/out/test-data.
-      * @param bic BIC hash
-      * @param records records
-      * @throws IOException
-      */
-    private void saveBICWithPinpointedBuggyLines(String bic,
+    /**
+     * Writes BIC with pinpointed buggy lines in CSV format.<p>
+     * The file is written at <code>projectPath</code>/out/test-data.
+     * @param reponame current repository name
+     * @param bic BIC hash
+     * @param records records
+     * @throws IOException
+     */
+    private void saveBICWithPinpointedBuggyLines(String reponame, String bic,
             HashMap<String, ArrayList<ArrayList<Object>>> records) 
                     throws IOException {
         try (CSVPrinter printer = new CSVPrinter(
                 new FileWriter(new File(String.join(File.separator, 
                                                     Utils.getProjectPath(), 
                                                     "out", "test-data", 
+                                                    searcher.getRepouser(), 
+                                                    reponame,
                                                     bic + ".csv"))), 
                 Builder.create(CSVFormat.DEFAULT)
                        .setHeader("Filename", 
@@ -213,129 +219,6 @@ public class DatasetMaker {
                 }
             }
         }
-    }
-
-    /**
-     * Gets added lines of the given commit hash.
-     * '+' in front of the added lines is deleted.
-     * @param hash the commit hash
-     * @return added lines of the given commit which are classified by files
-     * @throws GitAPIException 
-     * @throws MissingObjectException
-     * @throws IOException
-     */
-    private HashMap<String, ArrayList<String>> getAddedLines(String hash) 
-            throws GitAPIException, MissingObjectException, IOException {
-        String[] lines = searcher.diffCommits(
-                searcher.convertHashToPreviousCommit(hash),
-                searcher.convertHashToCommit(hash));
-        String filename = null;
-        ArrayList<String> addedList = new ArrayList<>();                  
-        HashMap<String, ArrayList<String>> addedLines = new HashMap<>(); 
-
-        for (String line : lines) {
-            if (line.startsWith("diff")) {
-                if (!addedList.isEmpty()) {
-                    addedLines.put(filename, addedList);
-
-                    addedList = new ArrayList<>();
-                }
-            } else if (line.startsWith("+++")) {
-                filename = line.substring(FILE_BEGIN_INDEX);
-            } else if (line.startsWith("+")) {
-                addedList.add(line.substring(LINE_BEGIN_INDEX));
-            }
-        }
-
-        if (!addedList.isEmpty()) {
-            addedLines.put(filename, addedList);
-        }
-
-        return addedLines;
-    }
-
-    /**
-     * Gets removed lines of the given commit.<p>
-     * '-' in front of the removed lines is deleted.<p>
-     * The file does not added to the return value if the file does not contain at least one removed line. 
-     * @param commit the commit hash
-     * @return removed lines of the given commit which are classified by files
-     * @throws GitAPIException
-     * @throws MissingObjectException
-     * @throws IOException
-     */
-    private HashMap<String, ArrayList<String>> getRemovedLines(String hash) 
-            throws GitAPIException, MissingObjectException, IOException {
-        String[] lines = searcher.diffCommits(
-                searcher.convertHashToPreviousCommit(hash), 
-                searcher.convertHashToCommit(hash));              
-        String filename = null;   
-        ArrayList<String> removedList = new ArrayList<>();
-        HashMap<String, ArrayList<String>> removedLines = new HashMap<>(); 
-
-        for (String line : lines) {
-            if (line.startsWith("diff")) {
-                if (!removedList.isEmpty()) {
-                    removedLines.put(filename, removedList);
-                    
-                    removedList = new ArrayList<>();
-                }
-            } else if (line.startsWith("---")) {
-                filename = line.substring(FILE_BEGIN_INDEX);
-            } else if (line.startsWith("-")) {
-                removedList.add(line.substring(LINE_BEGIN_INDEX));
-            }
-        }
-
-        if (!removedList.isEmpty()) {
-            removedLines.put(filename, removedList);
-        }
-
-        return removedLines;
-    }
-
-    /**
-     * Gets added and maintained lines of the given commit.<p>
-     * '+' in front of the added lines is not deleted.<p>
-     * ' ' in front of the maintained line is not deleted.<p>
-     * The file does not added to the return value if the file does not contain at least one added or maintained line. 
-     * @param hash the commit hash
-     * @return added and maintained lines of the given commit which are classified by files
-     * @throws GitAPIException
-     * @throws MissingObjectException
-     * @throws IOException
-     */
-    private HashMap<String, ArrayList<String>> getAddedAndMaintainedLines(
-            String hash) throws GitAPIException, MissingObjectException, 
-                                IOException {
-        String[] lines = searcher.diffCommits(
-            searcher.convertHashToPreviousCommit(hash), 
-            searcher.convertHashToCommit(hash));              
-        String filename = null;   
-        ArrayList<String> addedAndMaintainedList = new ArrayList<>();
-        HashMap<String, ArrayList<String>> addedAndMaintainedLines 
-                = new HashMap<>(); 
-
-        for (String line : lines) {
-            if (line.startsWith("diff")) {
-                if (!addedAndMaintainedList.isEmpty()) {
-                    addedAndMaintainedLines.put(filename, 
-                                                addedAndMaintainedList);
-                    
-                    addedAndMaintainedList = new ArrayList<>();
-                }
-            } else if (line.startsWith("---")) {
-                filename = line.substring(FILE_BEGIN_INDEX);
-            } else if (line.startsWith("+") || line.startsWith(" ")) {
-                addedAndMaintainedList.add(line);
-            }
-        }
-
-        if (!addedAndMaintainedList.isEmpty()) {
-            addedAndMaintainedLines.put(filename, addedAndMaintainedList);
-        }
-
-        return addedAndMaintainedLines;
     }
 
     /**
@@ -370,6 +253,146 @@ public class DatasetMaker {
 
         return buggyLines;
     } 
+
+    /**
+     * Gets added lines of the given extension file from the given commit hash.<p>
+     * '+' in front of the added lines is deleted.<p>
+     * The file name and removed lines don't added to the return value if the file does not contain at least one added line.
+     * @param hash the commit hash
+     * @param extension the extension
+     * @return added lines from the given commit hash which are classified by files
+     * @throws GitAPIException 
+     * @throws MissingObjectException
+     * @throws IOException
+     */
+    private HashMap<String, ArrayList<String>> getAddedLines(String hash, 
+            String extension) throws GitAPIException, MissingObjectException, 
+                                     IOException {
+        String[] lines = searcher.diffCommits(
+                searcher.convertHashToPreviousCommit(hash),
+                searcher.convertHashToCommit(hash));
+        boolean isExtension = false;
+        String filename = null;
+        ArrayList<String> addedList = new ArrayList<>();                  
+        HashMap<String, ArrayList<String>> addedLines = new HashMap<>(); 
+
+        for (String line : lines) {
+            if (line.startsWith("diff")) {
+                if (!addedList.isEmpty()) {
+                    addedLines.put(filename, addedList);
+
+                    addedList = new ArrayList<>();
+                }
+
+                isExtension = line.endsWith("." + extension);
+            } else if (isExtension && line.startsWith("+++")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
+            } else if (isExtension && line.startsWith("+")) {
+                addedList.add(line.substring(LINE_BEGIN_INDEX));
+            }
+        }
+
+        if (!addedList.isEmpty()) {
+            addedLines.put(filename, addedList);
+        }
+
+        return addedLines;
+    }
+
+    /**
+     * Gets removed lines of the given extension file from the given commit hash.<p>
+     * '-' in front of the removed lines is deleted.<p>
+     * The file name and removed lines don't added to the return value if the file does not contain at least one removed line.
+     * @param hash the commit hash
+     * @param extension the extension 
+     * @return removed lines from the given commit hash which are classified by files
+     * @throws GitAPIException
+     * @throws MissingObjectException
+     * @throws IOException
+     */
+    private HashMap<String, ArrayList<String>> getRemovedLines(String hash, 
+            String extension) throws GitAPIException, MissingObjectException, 
+                                     IOException {
+        String[] lines = searcher.diffCommits(
+                searcher.convertHashToPreviousCommit(hash), 
+                searcher.convertHashToCommit(hash));
+        boolean isExtension = false;              
+        String filename = null;   
+        ArrayList<String> removedList = new ArrayList<>();
+        HashMap<String, ArrayList<String>> removedLines = new HashMap<>(); 
+       
+        for (String line : lines) {
+            if (line.startsWith("diff")) {
+                if (!removedList.isEmpty()) {
+                    removedLines.put(filename, removedList);
+                    
+                    removedList = new ArrayList<>();
+                }
+                
+                isExtension = line.endsWith("." + extension);
+            } else if (isExtension && line.startsWith("---")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
+            } else if (isExtension && line.startsWith("-")) {
+                removedList.add(line.substring(LINE_BEGIN_INDEX));
+            }
+        }
+
+        if (!removedList.isEmpty()) {
+            removedLines.put(filename, removedList);
+        }
+
+        return removedLines;
+    }
+
+    /**
+     * Gets added and maintained lines of the given extension file from the given commit hash.<p>
+     * '+' in front of the added lines is not deleted.<p>
+     * ' ' in front of the maintained line is not deleted.<p>
+     * The file name and added and maintained lines don't added to the return value if the file doesn't contain at least one added or maintained line. 
+     * @param hash the commit hash
+     * @param extension the extension
+     * @return added and maintained lines of the given commit hash which are classified by files
+     * @throws GitAPIException
+     * @throws MissingObjectException
+     * @throws IOException
+     */
+    private HashMap<String, ArrayList<String>> getAddedAndMaintainedLines(
+            String hash, String extension) throws GitAPIException, 
+                                                  MissingObjectException, 
+                                                  IOException {
+        String[] lines = searcher.diffCommits(
+            searcher.convertHashToPreviousCommit(hash), 
+            searcher.convertHashToCommit(hash));    
+        boolean isExtension = false;
+        String filename = null;   
+        ArrayList<String> addedAndMaintainedList = new ArrayList<>();
+        HashMap<String, ArrayList<String>> addedAndMaintainedLines 
+                = new HashMap<>(); 
+
+        for (String line : lines) {
+            if (line.startsWith("diff")) {
+                if (!addedAndMaintainedList.isEmpty()) {
+                    addedAndMaintainedLines.put(filename, 
+                                                addedAndMaintainedList);
+                    
+                    addedAndMaintainedList = new ArrayList<>();
+                }
+
+                isExtension = line.endsWith("." + extension);
+            } else if (isExtension && line.startsWith("---")) {
+                filename = line.substring(FILE_BEGIN_INDEX);
+            } else if (isExtension 
+                       && (line.startsWith("+") || line.startsWith(" "))) {
+                addedAndMaintainedList.add(line);
+            }
+        }
+
+        if (!addedAndMaintainedList.isEmpty()) {
+            addedAndMaintainedLines.put(filename, addedAndMaintainedList);
+        }
+
+        return addedAndMaintainedLines;
+    }
 
     /**
      * Removes the given buggy lines from the file of the given path name.
