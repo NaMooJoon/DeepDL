@@ -19,6 +19,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
+import edu.handong.csee.isel.data.collector.util.Utils;
+
 /**
  * Class that gets data from GitHub. 
  */
@@ -163,15 +165,29 @@ public class GitHubSearcher implements AutoCloseable {
     }
 
     /**
-     * Changes this instance's git repository
-     * @param gitDir a local git repository metadata directory
+     * Changes this instance's <code>Git</code> instance with the given git metadata directory
+     * @param gitDir the git metadata directory
      * @throws IOException
      */
     public void changeRepository(String gitDir) throws IOException {
+        String[] nameElements;
+        
         if (git != null) {
             git.close();
         }
+         
         git = Git.open(new File(gitDir));
+        nameElements = gitDir.split(File.separator.equals("\\") 
+                                    ? "\\\\" 
+                                    : File.separator);
+
+        for (int i = 0; i < nameElements.length; i++) {
+            if (nameElements[i].equals(Utils.PROJECT_DIR)) {
+                repouser = nameElements[i + 3];
+
+                break;
+            }
+        }
     }
 
     @Override
