@@ -215,7 +215,7 @@ public class DatasetMaker {
                        .build())) {
             for (ArrayList<ArrayList<Object>> val : records.values()) {
                 for (ArrayList<Object> record : val) {
-                    printer.printRecords(record);
+                    printer.printRecord(record);
                 }
             }
         }
