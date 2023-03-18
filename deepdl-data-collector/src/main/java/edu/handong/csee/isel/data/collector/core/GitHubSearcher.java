@@ -171,15 +171,15 @@ public class GitHubSearcher implements AutoCloseable {
      */
     public void changeRepository(String gitDir) throws IOException {
         String[] nameElements;
+        String regex;
         
         if (git != null) {
             git.close();
         }
          
         git = Git.open(new File(gitDir));
-        nameElements = gitDir.split(File.separator.equals("\\") 
-                                    ? "\\\\" 
-                                    : File.separator);
+        regex = File.separator.equals("\\") ? "\\\\" : File.separator; 
+        nameElements = gitDir.split(regex);
 
         for (int i = 0; i < nameElements.length; i++) {
             if (nameElements[i].equals(Utils.PROJECT_DIR)) {
