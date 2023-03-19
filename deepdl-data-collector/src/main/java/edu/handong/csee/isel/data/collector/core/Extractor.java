@@ -156,17 +156,17 @@ public class Extractor {
     private int flushWaitFor(Process p) throws IOException {
         InputStream is = p.getInputStream();
         InputStream es = p.getErrorStream();
-    
+        
         while (p.isAlive()) {
-            if (is.available() >= 20) {
-                System.out.print(new String(is.readNBytes(10)));
+            if (is.available() > 0) {
+                System.out.print(new String(is.readNBytes(is.available())));
             }
 
-            if (es.available() >= 20) {
-                System.out.print(new String(es.readNBytes(10)));
+            if (es.available() > 0) {
+                System.out.print(new String(es.readNBytes(es.available())));
             }
         }
-        System.out.println("process ends");
+        
         return p.exitValue();
     }
 }
