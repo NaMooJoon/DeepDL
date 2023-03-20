@@ -1,5 +1,6 @@
 package edu.handong.csee.isel.data.collector;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import edu.handong.csee.isel.data.collector.core.DatasetMaker;
 import edu.handong.csee.isel.data.collector.core.Extractor;
 import edu.handong.csee.isel.data.collector.core.GitHubSearcher;
+import edu.handong.csee.isel.data.collector.util.FileOperations;
 import edu.handong.csee.isel.data.collector.util.Resources;
 import edu.handong.csee.isel.data.collector.util.Utils;
 
@@ -20,7 +22,6 @@ import edu.handong.csee.isel.data.collector.util.Utils;
  * Collector that collects data for DeepDL model.
  */
 public class DataCollector {
-    private String fileSeparator = System.getProperty("file.separator");
     private String projectPath = Utils.getProjectPath();
     
     /**
@@ -44,14 +45,12 @@ public class DataCollector {
             Files.createDirectories(Path.of(projectPath, "out", "bic"));
             Files.createDirectories(Path.of(projectPath, "out", "test-data"));
             
-            for (int i = 0; i < numRepositories; i++) {
+            for (int i = 2; i < numRepositories; i++) {
                 RevCommit splittingCommit;
-                String repoPath = 
-                        String.join(fileSeparator, 
-                                projectPath, "out", "snapshot", 
-                                resources[Resources.REPOUSER.ordinal()].get(i),
-                                resources[Resources.REPOSITORY.ordinal()]
-                                .get(i));
+                String repoPath = String.join(File.separator, 
+                        projectPath, "out", "snapshot", 
+                        resources[Resources.REPOUSER.ordinal()].get(i),
+                        resources[Resources.REPOSITORY.ordinal()].get(i));
                 
                 if (!Files.exists(Path.of(repoPath))) {
                     searcher.cloneRepository(
@@ -60,11 +59,11 @@ public class DataCollector {
                 }
 
                 searcher.changeRepository(
-                        String.join(fileSeparator, repoPath, ".git"));
+                        String.join(File.separator, repoPath, ".git"));
             
                 splittingCommit = searcher.getSplittingCommit(TRAIN_RATIO, 
                                                               null, END_DATE);
-          
+             
                 extractor.extractBFC(resources[Resources.URL.ordinal()].get(i), 
                         resources[Resources.KEY.ordinal()].get(i),
                         resources[Resources.REPOUSER.ordinal()].get(i), 
@@ -76,11 +75,16 @@ public class DataCollector {
                                                          .plusSeconds(1L))),
                         END_DATE);
                 extractor.extractBIC(
-                        resources[Resources.REPOSITORY.ordinal()].get(i));                        
+                        resources[Resources.REPOSITORY.ordinal()].get(i));                   
                 searcher.checkoutToSnapshot(splittingCommit);
+                Files.createDirectories(Path.of(projectPath, 
+                        "out", "test-data", 
+                        resources[Resources.REPOUSER.ordinal()].get(i),
+                        resources[Resources.REPOSITORY.ordinal()].get(i)));
                 maker.makeDataset(
                         resources[Resources.REPOSITORY.ordinal()].get(i), 
                         splittingCommit.getAuthorIdent().getWhen());
+                FileOperations.unpack(Path.of(repoPath), "java");
             }
         } catch (Exception e) {
             e.printStackTrace();
