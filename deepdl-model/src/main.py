@@ -38,6 +38,7 @@ def main(argv: list):
               '-ts <path-to-model-weight-file>', '<path-to-data-file>')
 
         return
+    
     if argv[2] == '-tr':
         train(int(argv[1]), argv[2], BATCH_SIZE, EPOCHS)
     

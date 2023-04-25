@@ -8,7 +8,7 @@ class DeepDLConfig():
   def __init__(self):
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(0.1, 
                                                                    4000, 0.99)
-    self.optimizer = tf.optimizers.legacy.SGD(learning_rate=learning_rate, 
+    self.optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=learning_rate, 
                                               momentum=0.5)
     self.optimizer.clipnorm = 5
     self.loss = DeepDLLoss()
