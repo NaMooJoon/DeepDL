@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 
 def get_angles(pos, i, d_model):
-  angle_rates = 1 / np.power(10000, (2 * (i//2)) / np.float32(d_model))
+  angle_rates = 1 / np.power(10000, (2 * (i // 2)) / np.float32(d_model))
   
   return pos * angle_rates
 
@@ -51,13 +51,17 @@ class EncoderLayer(tf.keras.layers.Layer):
     self.dropout2 = tf.keras.layers.Dropout(rate)
 
   def call(self, x, training, mask):
-    attn_output = self.mha(x, x, x, mask, False, training, False)  # (batch_size, input_seq_len, d_model)
-    attn_output = self.dropout1(attn_output, training=training)
-    out1 = self.layernorm1(x + attn_output)  # (batch_size, input_seq_len, d_model)
+    attn_out = self.mha(x, x, x, 
+                        mask, 
+                        return_attention_scores=False, 
+                        training=training, 
+                        use_causal_mask=False)  # (batch_size, input_seq_len, d_model)
+    attn_out = self.dropout1(attn_out, training=training)
+    out1 = self.layernorm1(x + attn_out)  # (batch_size, input_seq_len, d_model)
 
-    ffn_output = self.ffn(out1)  # (batch_size, input_seq_len, d_model)
-    ffn_output = self.dropout2(ffn_output, training=training)
-    out2 = self.layernorm2(out1 + ffn_output)  # (batch_size, input_seq_len, d_model)
+    ffn_out = self.ffn(out1)  # (batch_size, input_seq_len, d_model)
+    ffn_out = self.dropout2(ffn_out, training=training)
+    out2 = self.layernorm2(out1 + ffn_out)  # (batch_size, input_seq_len, d_model)
 
     return out2
 
@@ -86,18 +90,24 @@ class DecoderLayer(tf.keras.layers.Layer):
     # enc_output.shape == (batch_size, input_seq_len, d_model)
 
     attn1, attn_weights_block1 = self.mha1(x, x, x,                             # modified: calling tf.keras.MultiHeadAttention
-                                           padding_mask, True, training, True)  # (batch_size, target_seq_len, d_model) 
+                                           padding_mask, 
+                                           return_attention_scores=True, 
+                                           training=training, 
+                                           use_causal_mask=True)  # (batch_size, target_seq_len, d_model) 
     attn1 = self.dropout1(attn1, training=training)
     out1 = self.layernorm1(attn1 + x)
 
     attn2, attn_weights_block2 = self.mha2(out1, enc_output, enc_output,         # modified: calling tf.keras.MultiHeadAttention
-                                           padding_mask, True, training, False)  # (batch_size, target_seq_len, d_model)
+                                           padding_mask, 
+                                           return_attention_scores=True, 
+                                           training=training, 
+                                           use_causal_mask=False)  # (batch_size, target_seq_len, d_model)
     attn2 = self.dropout2(attn2, training=training)
     out2 = self.layernorm2(attn2 + out1)  # (batch_size, target_seq_len, d_model)
 
-    ffn_output = self.ffn(out2)  # (batch_size, target_seq_len, d_model)
-    ffn_output = self.dropout3(ffn_output, training=training)
-    out3 = self.layernorm3(ffn_output + out2)  # (batch_size, target_seq_len, d_model)
+    ffn_out = self.ffn(out2)  # (batch_size, target_seq_len, d_model)
+    ffn_out = self.dropout3(ffn_out, training=training)
+    out3 = self.layernorm3(ffn_out + out2)  # (batch_size, target_seq_len, d_model)
 
     return out3, attn_weights_block1, attn_weights_block2
   
@@ -178,8 +188,10 @@ class TransformerAccuracy(tf.keras.metrics.Metric):
   def __init__(self, name=None, dtype=None, **kwargs):
     super(TransformerAccuracy, self).__init__(name, dtype, **kwargs)
     
-    self.num_correct = self.add_weight(dtype=tf.float32, initializer='zeros')
-    self.total = self.add_weight(dtype=tf.float32, initializer='zeors')
+    self.num_correct = self.add_weight('num_correct', 
+                                       dtype=tf.float32, initializer='zeros')
+    self.total = self.add_weight('total', 
+                                 dtype=tf.float32, initializer='zeros')
     
   def update_state(self, y_true, y_pred):
     accuracies = tf.equal(tf.argmax(pred, axis=2), y_true)
