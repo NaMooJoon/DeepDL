@@ -79,7 +79,7 @@ class DeepDLTransformer(tf.keras.Model):
 
     return out, attn_w_dict
 
-  def create_padding_mask(seq):
+  def create_padding_mask(self, seq):
     seq = tf.cast(tf.math.logical_not(tf.math.equal(seq, 0)), dtype=tf.float32)
 
     # add extra dimensions to add the padding
