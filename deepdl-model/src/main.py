@@ -54,7 +54,7 @@ def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
     cen_line, con_line_block, _ = load_data(fn)
     cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_line, 
                                                          con_line_block)
-    config = DeepDLConfig(len(cen_enc_in), batch_size)
+    config = DeepDLConfig(rn, len(cen_enc_in), batch_size)
     model = DeepDLTransformer(vocab_size)
     
     model.compile(optimizer=config.optimizer, loss=config.loss, 
