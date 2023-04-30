@@ -57,7 +57,7 @@ class DeepDLTransformer(tf.keras.Model):
                            vocab_size, pe_cent, rate)
     self.linear_layer = tf.keras.layers.Dense(vocab_size)
 
-  def call(self, inputs, training, use_attn_out=False):
+  def call(self, inputs, training=None, use_attn_out=False):
     cen_enc_in, con_enc_in, dec_in = inputs
     
     if not use_attn_out: 
@@ -70,8 +70,10 @@ class DeepDLTransformer(tf.keras.Model):
                                             training, con_enc_padding_mask)  # (batch_size, con_in_seq_len, d_model)
       
       self.attn_out = self.attention_layer(cen_enc_out, con_enc_out, 
-                                          con_enc_padding_mask, False, 
-                                          training, False)  # (batchsize, cen_in_seq_len, d_model) 
+                                           attention_mask=con_enc_padding_mask, 
+                                           return_attention_scores=False, 
+                                           training=training, 
+                                           use_causal_mask=False)  # (batchsize, cen_in_seq_len, d_model) 
   
     dec_out, attn_w_dict = self.decoder(dec_in, self.attn_out, 
                                         training, self.cen_enc_padding_mask)  # dec_output.shape == (batch_size, dec_in_seq_len, d_model)
