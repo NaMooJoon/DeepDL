@@ -1,24 +1,43 @@
+import os
+
 import tensorflow as tf
 import numpy as np
 
 from operator import itemgetter
 from transformer import Encoder, Decoder, TransformerAccuracy
+from utils import getpd
 
 class DeepDLConfig():
-  def __init__(self):
-    learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(0.1, 
-                                                                   4000, 0.99)
-    self.optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=learning_rate, 
-                                              momentum=0.5)
-    self.optimizer.clipnorm = 5
-    self.loss = DeepDLLoss()
-    self.accuracy = TransformerAccuracy()
-    self.model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
-        os.path.join(os.getcwd(), 
-                     "..", "out", "weigths.{epcoh:02d}-{val_loss:.2f}.hdf5"),
+  def __init__(self, rn, num_data, batch_size):
+    learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
+        0.1, num_data // batch_size, 0.99)
+    self.__optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, 
+                                               momentum=0.5)
+    self.__optimizer.clipnorm = 5
+    self.__loss = DeepDLLoss()
+    self.__accuracy = TransformerAccuracy()
+    self.__model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
+        os.path.join(getpd(), 
+                     "out", rn, "weigths.{epoch:02d}-{val_loss:.2f}.hdf5"),
         verbose=1, 
         save_best_only=True,
         save_weights_only=True)
+
+    @property
+    def optimizer(self):
+      return self.__optimizer
+    
+    @property
+    def loss(self):
+      return self.__loss
+    
+    @property
+    def accuracy(self):
+      return self.__accuracy
+    
+    @property
+    def model_checkpoint(self):
+      return self.__model_checkpoint
 
 
 class DeepDLTransformer(tf.keras.Model):
@@ -106,7 +125,7 @@ class DeepDL(tf.Module):
 class DeepDLLoss(tf.keras.losses.Loss):
   
   def __init__(self, name=None):
-    super(TransformerLoss, self).__init__('none', name)
+    super(DeepDLLoss, self).__init__('none', name)
   
   def call(self, y_true, y_pred):
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
