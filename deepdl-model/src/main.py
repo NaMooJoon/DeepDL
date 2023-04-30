@@ -19,16 +19,17 @@ import json
 import os
 import sys
 
-from deepdl import DeepDLConfig, DeepDLTransformer, DeepDL
-
 import tensorflow as tf
+
+from deepdl import DeepDLConfig, DeepDLTransformer, DeepDL
+from utils import getpd
 
 EPOCHS = 50
 BATCH_SIZE = 16
 CEN_SEQ_LEN = 160
-CONTXT_SEQ_LEN = 4 * CEN_SEQ_LEN
+CON_SEQ_LEN = 4 * CEN_SEQ_LEN
 
-def main(argv: list):
+def main(argv: list) -> None:
     if len(argv) < 4 or (argv[1] == '-ts' and len(argv) < 5):
         print('usage: python main.py <vocab-size>',
               '<path-to-train-data-file> <path-to-test-data-file>')
@@ -40,15 +41,20 @@ def main(argv: list):
         return
     
     if argv[2] == '-tr':
-        train(int(argv[1]), argv[2], BATCH_SIZE, EPOCHS)
+        train(int(argv[1]), os.path.normpath(argv[3]), BATCH_SIZE, EPOCHS)
     
+     
+def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:    
+    rn = fn.split(os.sep)[-2]
+    dn = os.path.join(getpd(), 'out', rn)
     
-    
-def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
-    config = DeepDLConfig()
-    cent_line, contxt_line_block, _ = load_data(fn)
-    cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cent_line, 
-                                                         contxt_line_block)
+    if not os.path.exists(dn):
+        os.mkdir(dn)
+        
+    cen_line, con_line_block, _ = load_data(fn)
+    cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_line, 
+                                                         con_line_block)
+    config = DeepDLConfig(len(cen_enc_in), batch_size)
     model = DeepDLTransformer(vocab_size)
     
     model.compile(optimizer=config.optimizer, loss=config.loss, 
@@ -59,8 +65,8 @@ def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
               validation_split=0.1)
 
 def load_data(fn: str) -> tuple:
-    cent_line = []
-    contxt_line_block = []
+    cen_line = []
+    con_line_block = []
     label = []
 	
     with open(fn, newline='') as f:
@@ -69,53 +75,57 @@ def load_data(fn: str) -> tuple:
         next(reader)
     
         for row in reader:
-            cent_line.append(json.loads(row[0]))
-            contxt_line_block.append(json.loads(row[1]))  
+            cen_line.append(json.loads(row[0]))
+            con_line_block.append(json.loads(row[1]))  
             
             if len(row) > 2:
                 label.append(row[2] == 'True')
 
-    return cent_line, contxt_line_block, label
+    return cen_line, con_line_block, label
 
-def preprocess(cent_line: list, contxt_line_block: list) -> tuple:
-    eol = cent_line[0][-1]
-    sos = contxt_line_block[0][0]
-    eos = contxt_line_block[0][-1]
+def preprocess(cen_line: list, con_line_block: list) -> tuple:
+    eol = cen_line[0][-1]
+    sos = con_line_block[0][0]
+    eos = con_line_block[0][-1]
     
-    for line in cent_line:
-        for i in range(CEN_SEQ_LEN - len(line)):
-            line.append(0)
+    for i in range(len(cen_line)):
+        if len(cen_line[i]) > CEN_SEQ_LEN or len(con_line_block[i]) > CON_SEQ_LEN:
+            cen_line.pop(i)
+            con_line_block.pop(i)
+        else:
+            for j in range(CEN_SEQ_LEN - len(cen_line[i])):
+                cen_line[i].append(0)
+
+            for j in range(CON_SEQ_LEN - len(con_line_block[i])):
+                con_line_block[i].append(0)
+                
+    cen_enc_in = tf.constant(cen_line)
+    con_enc_in = tf.constant(con_line_block)
     
-    cen_enc_in = tf.constant(cent_line)
-    
-    for line in contxt_line_block:
-        for i in range(CONTXT_SEQ_LEN - len(line)):
-            line.append(0)	
-    
-    contxt_enc_in = tf.constant(contxt_lince_block)
-    
-    for line in cent_line:
+    for line in cen_line:
         idx = line.index(eol)
         
         line.pop(idx)
         line.insert(idx, eos)
     
-    dec_out = tf.constant(cent_line)
+    dec_out = tf.constant(cen_line)
     
-    for line in cent_line:
+    for line in cen_line:
         idx = line.index(eos)
         
         line.pop(idx)
         line.insert(0, sos)
     
-    dec_in = tf.constant(cent_line)
+    dec_in = tf.constant(cen_line)
     
-    return cen_enc_in, contxt_enc_in, dec_in, dec_out
+    return cen_enc_in, con_enc_in, dec_in, dec_out
 	     
 def test(vocab_size: int, w_fn: str, d_fn: str) -> None:
     pass
 
+
 if __name__ == '__main__':
     main(sys.argv)
+
 
 
