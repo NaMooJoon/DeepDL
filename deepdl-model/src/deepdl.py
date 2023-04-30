@@ -23,21 +23,21 @@ class DeepDLConfig():
         save_best_only=True,
         save_weights_only=True)
 
-    @property
-    def optimizer(self):
-      return self.__optimizer
-    
-    @property
-    def loss(self):
-      return self.__loss
-    
-    @property
-    def accuracy(self):
-      return self.__accuracy
-    
-    @property
-    def model_checkpoint(self):
-      return self.__model_checkpoint
+  @property
+  def optimizer(self):
+    return self.__optimizer
+  
+  @property
+  def loss(self):
+    return self.__loss
+  
+  @property
+  def accuracy(self):
+    return self.__accuracy
+  
+  @property
+  def model_checkpoint(self):
+    return self.__model_checkpoint
 
 
 class DeepDLTransformer(tf.keras.Model):
