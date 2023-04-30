@@ -54,7 +54,7 @@ class DeepDLTransformer(tf.keras.Model):
             num_heads, d_model // num_heads)
     self.decoder = Decoder(num_layers, d_model, num_heads, dff,
                            vocab_size, pe_cent, rate)
-    self.linear_layer = tf.keras.layers.Dense(target_vocab_size)
+    self.linear_layer = tf.keras.layers.Dense(vocab_size)
 
   def call(self, inputs, training, use_attn_out=False):
     cen_enc_in, con_enc_in, dec_in = inputs
