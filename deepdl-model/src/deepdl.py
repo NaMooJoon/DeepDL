@@ -136,4 +136,4 @@ class DeepDLLoss(tf.keras.losses.Loss):
     mask = tf.cast(tf.math.logical_not(tf.math.equal(y_true, 0)), 
                    dtype=loss.dtype) 
     
-    return tf.math.divide(tf.reduce_sum(loss * mask), tf.shape(y_true)[0])
+    return tf.math.divide(tf.reduce_sum(loss * mask), tf.cast(tf.shape(y_true)[0], tf.float32))
