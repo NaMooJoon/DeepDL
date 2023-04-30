@@ -8,6 +8,7 @@ from transformer import Encoder, Decoder, TransformerAccuracy
 from utils import getpd
 
 class DeepDLConfig():
+  
   def __init__(self, rn, num_data, batch_size):
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         0.1, num_data // batch_size, 0.99)
@@ -51,7 +52,7 @@ class DeepDLTransformer(tf.keras.Model):
     self.contextual_encoder = Encoder(num_layers, d_model, num_heads, dff,
                                       vocab_size, pe_contxt, rate)
     self.attention_layer = tf.keras.layers.MultiHeadAttention(
-            num_heads, d_model // num_heads)
+        num_heads, d_model // num_heads)
     self.decoder = Decoder(num_layers, d_model, num_heads, dff,
                            vocab_size, pe_cent, rate)
     self.linear_layer = tf.keras.layers.Dense(vocab_size)
