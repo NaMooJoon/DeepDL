@@ -4,7 +4,7 @@ Hyper parameters based on the Qiu et al. - Deep Just-In-Time Defect Localization
 epochs: 50
 batch size: 16
 optimizer: SGD
-initial learning rate: 0.1
+initial learning rate: 0.1 -> 0.01
 learning rate decay: 0.99
 momentum: 0.5
 clip gradients norm: 5
