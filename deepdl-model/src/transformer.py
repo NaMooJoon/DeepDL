@@ -89,7 +89,7 @@ class DecoderLayer(tf.keras.layers.Layer):
     # enc_output.shape == (batch_size, input_seq_len, d_model)
 
     # modified: calling tf.keras.MultiHeadAttention
-    attn1, attn_weights_block1 = self.mha1(x, x, x, mask                            
+    attn1, attn_weights_block1 = self.mha1(x, x, x, mask,                            
                                            return_attention_scores=True, 
                                            training=training, 
                                            use_causal_mask=True)  # (batch_size, target_seq_len, d_model) 
