@@ -193,7 +193,8 @@ class TransformerAccuracy(tf.keras.metrics.Metric):
                                  dtype=tf.float32, initializer='zeros')
     
   def update_state(self, y_true, y_pred, **kwargs):
-    accuracies = tf.equal(tf.argmax(y_pred, axis=2), y_true)
+    accuracies = tf.equal(tf.argmax(y_pred, axis=2, output_type=tf.int32), 
+                          y_true)
     mask = tf.math.logical_not(tf.math.equal(y_true, 0))
     
     accuracies = tf.cast(tf.math.logical_and(accuracies, mask), 
