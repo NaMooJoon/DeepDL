@@ -80,7 +80,7 @@ class DeepDLTransformer(tf.keras.Model):
     linear_out = self.linear_layer(dec_out)  # (batch_size, dec_in_seq_len, target_vocab_size)
     out = tf.math.softmax(linear_out, axis=2)
 
-    return out if training else out, attn_w_dict
+    return out if training else (out, attn_w_dict)
 
   def create_padding_mask(self, seq):
     seq = tf.cast(tf.math.logical_not(tf.math.equal(seq, 0)), dtype=tf.float32)
