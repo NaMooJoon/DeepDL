@@ -11,7 +11,7 @@ class DeepDLConfig():
   
   def __init__(self, rn, num_data, batch_size):
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
-        0.1, num_data // batch_size, 0.99)
+        0.01, num_data // batch_size, 0.99)
     self.__optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, 
                                                momentum=0.5)
     self.__optimizer.clipnorm = 5
@@ -57,7 +57,7 @@ class DeepDLTransformer(tf.keras.Model):
                            vocab_size, pe_cent, rate)
     self.linear_layer = tf.keras.layers.Dense(vocab_size)
 
-  def call(self, inputs, training=None, use_attn_out=False):
+  def call(self, inputs, training=None, mask=None, use_attn_out=False):
     cen_enc_in, con_enc_in, dec_in = inputs
     
     if not use_attn_out: 
@@ -74,13 +74,13 @@ class DeepDLTransformer(tf.keras.Model):
                                            return_attention_scores=False, 
                                            training=training, 
                                            use_causal_mask=False)  # (batchsize, cen_in_seq_len, d_model) 
-  
+    
     dec_out, attn_w_dict = self.decoder(dec_in, self.attn_out, 
                                         training, self.cen_enc_padding_mask)  # dec_output.shape == (batch_size, dec_in_seq_len, d_model)
     linear_out = self.linear_layer(dec_out)  # (batch_size, dec_in_seq_len, target_vocab_size)
     out = tf.math.softmax(linear_out, axis=2)
 
-    return out, attn_w_dict
+    return out if training else out, attn_w_dict
 
   def create_padding_mask(self, seq):
     seq = tf.cast(tf.math.logical_not(tf.math.equal(seq, 0)), dtype=tf.float32)
@@ -136,4 +136,5 @@ class DeepDLLoss(tf.keras.losses.Loss):
     mask = tf.cast(tf.math.logical_not(tf.math.equal(y_true, 0)), 
                    dtype=loss.dtype) 
     
-    return tf.math.divide(tf.reduce_sum(loss * mask), tf.cast(tf.shape(y_true)[0], tf.float32))
+    return tf.math.divide(tf.reduce_sum(loss * mask), 
+                          tf.cast(tf.shape(y_true)[0], tf.float32))
