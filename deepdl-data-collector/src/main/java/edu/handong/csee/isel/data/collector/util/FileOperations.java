@@ -15,19 +15,20 @@ public class FileOperations {
     
     /**
      * Unpacks all of the given extension files and removes the other files of the given directory.
-     * @param dir the directory
+     * @param rootDir the directory
      * @param extension the extension
      * @throws IOException
      */
-    public static void unpack(Path dir, String extension) throws IOException {
-        Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+    public static void unpack(Path rootDir, String extension) throws IOException {
+    
+        Files.walkFileTree(rootDir, new SimpleFileVisitor<Path>() {
             
             @Override 
             public FileVisitResult visitFile(Path file, 
                                              BasicFileAttributes attrs) 
                                                     throws IOException {
                 if (file.getFileName().toString().endsWith("." + extension)) {
-                    Files.move(file, dir.resolve(file.getFileName()), 
+                    Files.move(file, rootDir.resolve(file.getFileName()), 
                                StandardCopyOption.REPLACE_EXISTING);
                 } else {
                     Files.delete(file);
@@ -39,7 +40,9 @@ public class FileOperations {
             @Override 
             public FileVisitResult postVisitDirectory(Path dir, 
                     IOException exc) throws IOException {
-                Files.delete(dir);
+                if (!dir.equals(rootDir)) {
+                    Files.delete(dir);
+                }
                 
                 return FileVisitResult.CONTINUE;
             }
