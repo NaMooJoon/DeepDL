@@ -125,7 +125,8 @@ public class DatasetMaker {
     private HashMap<String, ArrayList<ArrayList<Object>>> makeRecords(
             HashMap<String, ArrayList<String>> addedAndMaintainedLines,
             HashMap<String, ArrayList<String>> removedLines) {        
-        HashMap<String, ArrayList<ArrayList<Object>>> records = new HashMap<>();
+        HashMap<String, ArrayList<ArrayList<Object>>> records = 
+                new HashMap<>();
 
         for (String key : addedAndMaintainedLines.keySet()) {
             ArrayList<String> addedAndMaintainedList = 
@@ -138,7 +139,7 @@ public class DatasetMaker {
             for (int i = 0; i < addedAndMaintainedList.size(); i++) {
                 if (addedAndMaintainedList.get(i).startsWith("+")) {
                     ArrayList<Object> record = new ArrayList<>();
-
+                    
                     record.add(key);
                     
                     for (int j = i - 2; j <= i + 2; j++) {
@@ -366,8 +367,8 @@ public class DatasetMaker {
         boolean isExtension = false;
         String filename = null;   
         ArrayList<String> addedAndMaintainedList = new ArrayList<>();
-        HashMap<String, ArrayList<String>> addedAndMaintainedLines 
-                = new HashMap<>(); 
+        HashMap<String, ArrayList<String>> addedAndMaintainedLines = 
+                new HashMap<>(); 
 
         for (String line : lines) {
             if (line.startsWith("diff")) {
@@ -382,7 +383,8 @@ public class DatasetMaker {
             } else if (isExtension && line.startsWith("---")) {
                 filename = line.substring(FILE_BEGIN_INDEX);
             } else if (isExtension 
-                       && (line.startsWith("+") || line.startsWith(" "))) {
+                       && (line.startsWith("+") || line.startsWith(" "))
+                       && !line.isBlank()) {
                 addedAndMaintainedList.add(line);
             }
         }
@@ -418,10 +420,12 @@ public class DatasetMaker {
         try (BufferedReader reader = 
                 new BufferedReader(new FileReader(file))) {
             String line;
-           
+            System.out.printf("file: %s\n", pathname);
+            int lineCount = 1;
             while ((line = reader.readLine()) != null) {
                 if (!buggyLines.contains(line)) {
                     lines.add(line);
+                    System.out.printf("buggy line: line %d %s\n", lineCount++, line);
                 }
             }
         }
