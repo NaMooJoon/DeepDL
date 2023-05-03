@@ -27,6 +27,7 @@ import edu.handong.csee.isel.data.collector.util.Utils;
 public class GitHubSearcher implements AutoCloseable {
     private Git git;
     private String repouser;
+    private String repository;
 
     /**
      * Clones the repository to the given directory.
@@ -40,10 +41,10 @@ public class GitHubSearcher implements AutoCloseable {
     public void cloneRepository(String uri, String dir) 
             throws InvalidRemoteException, 
                     TransportException, GitAPIException {
-        File directory = new File(dir);
-        CloneCommand cloneCommand = new CloneCommand();
-
-        cloneCommand.setURI(uri).setDirectory(directory).call().close();
+        new CloneCommand().setURI(uri)
+                          .setDirectory(new File(dir))
+                          .call()
+                          .close();
     }
 
     /**
@@ -165,7 +166,8 @@ public class GitHubSearcher implements AutoCloseable {
     }
 
     /**
-     * Changes this instance's <code>Git</code> instance with the given git metadata directory
+     * Changes this instance's <code>Git</code> instance with the given git metadata directory.
+     * The repouser and repository of the given git metadata directory is set.  
      * @param gitDir the git metadata directory
      * @throws IOException
      */
@@ -184,6 +186,7 @@ public class GitHubSearcher implements AutoCloseable {
         for (int i = 0; i < nameElements.length; i++) {
             if (nameElements[i].equals(Utils.PROJECT_DIR)) {
                 repouser = nameElements[i + 3];
+                repository = nameElements[i + 4];
 
                 break;
             }
@@ -197,5 +200,9 @@ public class GitHubSearcher implements AutoCloseable {
 
     public String getRepouser() {
         return repouser;
+    }
+
+    public String getRepository() {
+        return repository;
     }
 }
