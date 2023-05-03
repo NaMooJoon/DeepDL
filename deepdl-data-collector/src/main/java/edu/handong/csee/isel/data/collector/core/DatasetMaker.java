@@ -55,11 +55,12 @@ public class DatasetMaker {
      * @throws IOException
      * @throws GitAPIException
      */
-    public void makeDataset(String reponame, Date splittingPoint) 
+    public void makeDataset(Date splittingPoint) 
             throws MissingObjectException, IOException, GitAPIException {
         JSONArray ja = new JSONArray(
                 Files.readAllLines(Path.of(Utils.getProjectPath(), 
-                                   "out", "bic", "bic_" + reponame + ".json"))
+                                   "out", "bic", 
+                                   "bic_" + searcher.getRepository() + ".json"))
                      .get(0));
         HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> 
                 records = new HashMap<>();
@@ -93,7 +94,7 @@ public class DatasetMaker {
 
         for (Entry<String, HashMap<String, ArrayList<ArrayList<Object>>>> entry
                 : records.entrySet()) {
-            saveBICWithPinpointedBuggyLines(reponame, entry.getKey(), entry.getValue());
+            saveBICWithPinpointedBuggyLines(entry.getKey(), entry.getValue());
         }        
     }
 
@@ -198,7 +199,7 @@ public class DatasetMaker {
      * @param records records
      * @throws IOException
      */
-    private void saveBICWithPinpointedBuggyLines(String reponame, String bic,
+    private void saveBICWithPinpointedBuggyLines(String bic,
             HashMap<String, ArrayList<ArrayList<Object>>> records) 
                     throws IOException {
         try (CSVPrinter printer = new CSVPrinter(
@@ -206,7 +207,7 @@ public class DatasetMaker {
                                                     Utils.getProjectPath(), 
                                                     "out", "test-data", 
                                                     searcher.getRepouser(), 
-                                                    reponame,
+                                                    searcher.getRepository(),
                                                     bic.substring(0, 5) 
                                                     + ".csv"))), 
                 Builder.create(CSVFormat.DEFAULT)
