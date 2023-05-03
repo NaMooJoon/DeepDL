@@ -45,7 +45,7 @@ public class DataCollector {
             Files.createDirectories(Path.of(projectPath, "out", "bic"));
             Files.createDirectories(Path.of(projectPath, "out", "test-data"));
             
-            for (int i = 2; i < numRepositories; i++) {
+            for (int i = 1; i < numRepositories; i++) {
                 RevCommit splittingCommit;
                 String repoPath = String.join(File.separator, 
                         projectPath, "out", "snapshot", 
@@ -81,9 +81,7 @@ public class DataCollector {
                         "out", "test-data", 
                         resources[Resources.REPOUSER.ordinal()].get(i),
                         resources[Resources.REPOSITORY.ordinal()].get(i)));
-                maker.makeDataset(
-                        resources[Resources.REPOSITORY.ordinal()].get(i), 
-                        splittingCommit.getAuthorIdent().getWhen());
+                maker.makeDataset(splittingCommit.getAuthorIdent().getWhen());
                 FileOperations.unpack(Path.of(repoPath), "java");
             }
         } catch (Exception e) {
