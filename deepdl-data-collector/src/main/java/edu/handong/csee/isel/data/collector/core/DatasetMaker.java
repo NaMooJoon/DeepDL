@@ -60,7 +60,7 @@ public class DatasetMaker {
         JSONArray ja = new JSONArray(
                 Files.readAllLines(Path.of(Utils.getProjectPath(), 
                                    "out", "bic", "bic_" + reponame + ".json"))
-                .get(0));
+                     .get(0));
         HashMap<String, HashMap<String, ArrayList<ArrayList<Object>>>> 
                 records = new HashMap<>();
 
@@ -207,7 +207,8 @@ public class DatasetMaker {
                                                     "out", "test-data", 
                                                     searcher.getRepouser(), 
                                                     reponame,
-                                                    bic + ".csv"))), 
+                                                    bic.substring(0, 5) 
+                                                    + ".csv"))), 
                 Builder.create(CSVFormat.DEFAULT)
                        .setHeader("Filename", 
                                   "Line1", "Line2", "Line3", 
@@ -384,7 +385,7 @@ public class DatasetMaker {
                 filename = line.substring(FILE_BEGIN_INDEX);
             } else if (isExtension 
                        && (line.startsWith("+") || line.startsWith(" "))
-                       && !line.isBlank()) {
+                       && !line.substring(1).isBlank()) {
                 addedAndMaintainedList.add(line);
             }
         }
