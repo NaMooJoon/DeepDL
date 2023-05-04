@@ -1,13 +1,11 @@
 package edu.handong.csee.isel.data.collector.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.io.CommitHashReader;
@@ -20,19 +18,24 @@ import edu.handong.csee.isel.data.collector.util.Utils;
  * All of the exe file path for these programs should be in the environment path.
  */
 public class Extractor {
+    private GitHubSearcher searcher;
     private String command;
     private String option;
     private String program;
     private String projectPath = Utils.getProjectPath();
-    
+
     /**
      * Initializes the command and option for extracting BFC and BIC depends on the OS system.
+     * Set searcher of this instance with the given searcher.
+     * @param searcher the searcher
      */
-    public Extractor() {
+    public Extractor(GitHubSearcher searcher) {
         boolean isWindows = System.getProperty("os.name")
                                   .toLowerCase()
                                   .startsWith("windows");
         
+        this.searcher = searcher;
+
         if (isWindows) {
             command = "cmd.exe"; 
             option = "/c";
@@ -45,12 +48,10 @@ public class Extractor {
     }
 
     /**
-     * Extracts BFC of the given GitHub repository from [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
-     * The file will be written in <code>projectPath</code>/out/bfc.
+     * Extracts BFC of this instance's repository in range of [<code>startDate</code>, <code>endDate</code>) and writes it in csv file using DPMiner.
+     * The file is written in <code>projectPath</code>/out/bfc.
      * @param url the url of the respository 
 	 * @param key the Jira key of the repository
-	 * @param repouser the repouser of the repository
-	 * @param repository the name of the repository
      * @param startDate start date of the repositories' BFC
      * @param endDate end date of the repositories' BFC
      * @throws IOException
@@ -58,7 +59,6 @@ public class Extractor {
      * @throws FileFormatException
      */
     public void extractBFC(String url, String key, 
-						   String repouser, String repository, 
             			   String startDate, String endDate) 
                     				throws IOException, InterruptedException, 
                             		  	   FileFormatException {
@@ -71,9 +71,10 @@ public class Extractor {
                                       DPMinerPath, "patch", 
                                       "-i", url, "-o", patchPath, 
                                       "-ij", "-jk", key);
-        String fileName = String.join(File.separator, 
-                                      projectPath, "out", "bfc", 
-									  "bfc_" + repository + ".json"); 
+        String fileName = String.join(
+                File.separator, 
+                projectPath, "out", "bfc", 
+				"bfc_" + searcher.getRepository() + ".json"); 
         BFCWriter writer = new BFCWriter(fileName);
 	    
 		execute(command, option, argument, projectPath);
@@ -81,35 +82,36 @@ public class Extractor {
 		reader = new CommitHashReader(String.join(
                         File.separator, 
                         projectPath, patchPath, 
-						"PATCH_" + repository + ".csv"));
+						"PATCH_" + searcher.getRepository() + ".csv"));
 		
-        writer.writeBFC(repouser, repository, 
-						reader.readCommitHashes(repository, 
+        writer.writeBFC(searcher.getRepouser(), searcher.getRepository(), 
+						reader.readCommitHashes(searcher.getRepository(), 
 												startDate, endDate));
         reader.close();
         writer.close();
     }
 
     /**
-     * Extracts BIC of the given repository and writes it in JSON file by using PySZZ.
+     * Extracts BIC of this instance's repository and writes it in JSON file by using PySZZ.
      * The file will be written in <code>projectPath</code>/out.
-     * @param reponame the name of the repository
      * @throws IOException
      * @throws InterruptedException
      */
-    public void extractBIC(String reponame) throws IOException, InterruptedException {
+    public void extractBIC() 
+            throws IOException, InterruptedException {
 		String mainPath = String.join(File.separator, 
                                       "..", "tools", "pyszz", 
                                       "main.py");
-        String BFCPath = String.join(File.separator, 
-                                     "out", "bfc", 
-                                     "bfc_" + reponame + ".json");
+        String BFCPath = String.join(
+                File.separator, 
+                "out", "bfc", 
+                "bfc_" + searcher.getRepository() + ".json");
 		String ymlPath = String.join(File.separator, 
                                      "..", "tools", "pyszz", 
                                      "conf", "raszz.yml");
         String repoPath = String.join(File.separator, "out", "snapshot");
         String argument = String.join(" ", 
-                                      "python3", mainPath, 
+                                      "python", mainPath, 
                                       BFCPath, ymlPath, repoPath);
 		String outPath = String.join(File.separator, projectPath, "out");
         
@@ -124,7 +126,8 @@ public class Extractor {
                                                 "bic_ra_\\d+.json");  
                                     }
                                 })[0]),  
-				   Path.of(outPath, "bic", "bic_" + reponame + ".json"));
+				   Path.of(outPath, 
+                          "bic", "bic_" + searcher.getRepository() + ".json"));
     }
 
     /**
