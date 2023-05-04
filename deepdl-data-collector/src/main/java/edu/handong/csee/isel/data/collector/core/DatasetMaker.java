@@ -48,8 +48,7 @@ public class DatasetMaker {
      * Makes clean snapshots of the current repository by using BIC before the given splitting point 
      * and writes BIC files with pinpointed buggy lines of the current repository by using BIC after the given splitting point.<p>
      * The files in the <code>projectPath</code>/out/snapshot is modified to make clean snapshots.<p>
-     * The BIC files with pinpointed buggy lines is written at <code>projectPath</code>/out/test-data. 
-     * @param reponmae name of the current repository
+     * The BIC files with pinpointed buggy lines is written at <code>projectPath</code>/out/test-data.
      * @param splittingPoint the splitting point
      * @throws MissingObjectException
      * @throws IOException
@@ -194,7 +193,6 @@ public class DatasetMaker {
     /**
      * Writes BIC with pinpointed buggy lines in CSV format.<p>
      * The file is written at <code>projectPath</code>/out/test-data.
-     * @param reponame current repository name
      * @param bic BIC hash
      * @param records records
      * @throws IOException
