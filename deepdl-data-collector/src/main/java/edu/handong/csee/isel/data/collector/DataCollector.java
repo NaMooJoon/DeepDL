@@ -6,87 +6,74 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import edu.handong.csee.isel.data.collector.core.DatasetMaker;
 import edu.handong.csee.isel.data.collector.core.Extractor;
 import edu.handong.csee.isel.data.collector.core.GitHubSearcher;
-import edu.handong.csee.isel.data.collector.util.FileOperations;
-import edu.handong.csee.isel.data.collector.util.Resources;
+import edu.handong.csee.isel.data.collector.exception.FileFormatException;
 import edu.handong.csee.isel.data.collector.util.Utils;
 
 /**
  * Collector that collects data for DeepDL model.
  */
 public class DataCollector {
+    private GitHubSearcher searcher = new GitHubSearcher();
+    private Extractor extractor = new Extractor(searcher);
+    private DatasetMaker maker = new DatasetMaker(searcher);
     private String projectPath = Utils.getProjectPath();
     
     /**
-     * Collects data for DeepDL model.
+     * Collects data from the repository of the given url and key for DeepDL model.
+     * @param url the github repository url
+     * @param key the jira key
      */
-    public void collect() {
+    public void collect(String url, String key) 
+            throws IOException, GitAPIException, 
+                   InterruptedException, FileFormatException {
         final String END_DATE = "2021-11-30";
         final float TRAIN_RATIO = 0.6F;
+
+        RevCommit splittingCommit;
+        String[] elements = url.split("/");
+        String repouser = elements[elements.length - 2];
+        String repository = elements[elements.length - 1];
+        String repoPath = String.join(File.separator, 
+                                      projectPath, "out", "snapshot", 
+                                      repouser, repository);
+
+        searcher.setRepouser(repouser);
+        searcher.setRepository(repository);
+        Files.createDirectories(Path.of(projectPath, "out", "bfc"));
+        Files.createDirectories(Path.of(projectPath, "out", "bic"));
+        Files.createDirectories(Path.of(projectPath, 
+                                        "out", "test-data", 
+                                        repouser, repository));
         
-        try (GitHubSearcher searcher = new GitHubSearcher()) {
-            int numRepositories;    
-            List<String>[] resources = new List[4];
-            Extractor extractor = new Extractor();
-            DatasetMaker maker = new DatasetMaker(searcher);
-
-            loadResources(resources);
-
-            numRepositories = resources[Resources.URL.ordinal()].size();
-
-            Files.createDirectories(Path.of(projectPath, "out", "bfc"));
-            Files.createDirectories(Path.of(projectPath, "out", "bic"));
-            Files.createDirectories(Path.of(projectPath, "out", "test-data"));
-            
-            for (int i = 1; i < numRepositories; i++) {
-                RevCommit splittingCommit;
-                String repoPath = String.join(File.separator, 
-                        projectPath, "out", "snapshot", 
-                        resources[Resources.REPOUSER.ordinal()].get(i),
-                        resources[Resources.REPOSITORY.ordinal()].get(i));
-                
-                if (!Files.exists(Path.of(repoPath))) {
-                    searcher.cloneRepository(
-                            resources[Resources.URL.ordinal()].get(i), 
-                            repoPath);
-                }
-
-                searcher.changeRepository(
-                        String.join(File.separator, repoPath, ".git"));
-            
-                splittingCommit = searcher.getSplittingCommit(TRAIN_RATIO, 
-                                                              null, END_DATE);
-             
-                extractor.extractBFC(resources[Resources.URL.ordinal()].get(i), 
-                        resources[Resources.KEY.ordinal()].get(i),
-                        resources[Resources.REPOUSER.ordinal()].get(i), 
-                        resources[Resources.REPOSITORY.ordinal()].get(i),
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
-                                Date.from(splittingCommit.getAuthorIdent()
-                                                         .getWhen()
-                                                         .toInstant()
-                                                         .plusSeconds(1L))),
-                        END_DATE);
-                extractor.extractBIC(
-                        resources[Resources.REPOSITORY.ordinal()].get(i));                   
-                searcher.checkoutToSnapshot(splittingCommit);
-                Files.createDirectories(Path.of(projectPath, 
-                        "out", "test-data", 
-                        resources[Resources.REPOUSER.ordinal()].get(i),
-                        resources[Resources.REPOSITORY.ordinal()].get(i)));
-                maker.makeDataset(splittingCommit.getAuthorIdent().getWhen());
-                FileOperations.unpack(Path.of(repoPath), "java");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!Files.exists(Path.of(repoPath))) {
+            searcher.cloneRepository(url, repoPath);
         }
+
+        searcher.changeRepository(String.join(File.separator, 
+                                              repoPath, ".git"));
+    
+        splittingCommit = searcher.getSplittingCommit(TRAIN_RATIO, 
+                                                      null, END_DATE);
+        
+        extractor.extractBFC(
+                url, key, 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
+                        Date.from(splittingCommit.getAuthorIdent()
+                                                 .getWhen()
+                                                 .toInstant()
+                                                 .plusSeconds(1L))),
+                END_DATE);
+        extractor.extractBIC();                   
+        searcher.checkoutToSnapshot(splittingCommit);
+        maker.makeDataset(splittingCommit.getAuthorIdent().getWhen());
+        Utils.unpack(Path.of(repoPath), "java");
     }
 
     /**
@@ -97,6 +84,7 @@ public class DataCollector {
      * Index 3: represents repositories<p>
      * @param resources resource array
      */
+    /** 
     private void loadResources(List<String>[] resources) {
         Path resourcePath = Path.of(projectPath, "src", "main", "resources");
 
@@ -121,4 +109,5 @@ public class DataCollector {
             e.printStackTrace();
         } 
     }
+    **/
 }
