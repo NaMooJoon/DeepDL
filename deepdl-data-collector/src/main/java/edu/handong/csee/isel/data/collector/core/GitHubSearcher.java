@@ -19,8 +19,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
-import edu.handong.csee.isel.data.collector.util.Utils;
-
 /**
  * Class that gets data from GitHub. 
  */
@@ -32,6 +30,7 @@ public class GitHubSearcher implements AutoCloseable {
     /**
      * Clones the repository to the given directory.
      * Creates the directory by creating all of the nonexistent parent directory if there is no given directory.
+     * The <code>Git</code> instance of the given url is set to <code>git</code> of this instance.
      * @param uri GitHub respository uri
      * @param dir the directory
      * @throws InvaildRemoteException
@@ -39,8 +38,8 @@ public class GitHubSearcher implements AutoCloseable {
      * @throws GitAPIException
      */
     public void cloneRepository(String uri, String dir) 
-            throws InvalidRemoteException, 
-                    TransportException, GitAPIException {
+            throws InvalidRemoteException, TransportException, 
+                   GitAPIException, IOException {
         new CloneCommand().setURI(uri)
                           .setDirectory(new File(dir))
                           .call()
@@ -167,30 +166,15 @@ public class GitHubSearcher implements AutoCloseable {
 
     /**
      * Changes this instance's <code>Git</code> instance with the given git metadata directory.
-     * The repouser and repository of the given git metadata directory is set.  
      * @param gitDir the git metadata directory
      * @throws IOException
      */
     public void changeRepository(String gitDir) throws IOException {
-        String[] nameElements;
-        String regex;
-        
         if (git != null) {
             git.close();
         }
-         
+        
         git = Git.open(new File(gitDir));
-        regex = File.separator.equals("\\") ? "\\\\" : File.separator; 
-        nameElements = gitDir.split(regex);
-
-        for (int i = 0; i < nameElements.length; i++) {
-            if (nameElements[i].equals(Utils.PROJECT_DIR)) {
-                repouser = nameElements[i + 3];
-                repository = nameElements[i + 4];
-
-                break;
-            }
-        }
     }
 
     @Override
@@ -204,5 +188,13 @@ public class GitHubSearcher implements AutoCloseable {
 
     public String getRepository() {
         return repository;
+    }
+
+    public void setRepouser(String repouser) {
+        this.repouser = repouser;
+    }
+
+    public void setRepository(String repository) {
+        this.repository = repository;
     }
 }
