@@ -50,19 +50,21 @@ def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
     
     if not os.path.exists(dn):
         os.mkdir(dn)
-        
-    cen_line, con_line_block, _ = load_data(fn)
-    cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_line, 
-                                                         con_line_block)
-    config = DeepDLConfig(rn, len(cen_enc_in), batch_size)
-    model = DeepDLTransformer(vocab_size)
     
-    model.compile(optimizer=config.optimizer, loss=config.loss, 
-                  metrics=[config.accuracy])
-    model.fit(x=[cen_enc_in, con_enc_in, dec_in], y=dec_out, 
-              batch_size=batch_size, epochs=epochs, 
-              callbacks=[config.model_checkpoint],
-              validation_split=0.1)
+    cen_line, con_line_block, _ = load_data(fn)
+    
+    with tf.distribute.MirroredStrategy().scope():
+        cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_line, 
+                                                             con_line_block)
+        config = DeepDLConfig(rn, len(cen_enc_in), batch_size)
+        model = DeepDLTransformer(vocab_size)
+        
+        model.compile(optimizer=config.optimizer, loss=config.loss, 
+                      metrics=[config.accuracy])
+        model.fit(x=[cen_enc_in, con_enc_in, dec_in], y=dec_out, 
+                  batch_size=batch_size, epochs=epochs, 
+                  callbacks=[config.model_checkpoint],
+                  validation_split=0.1)
 
 def load_data(fn: str) -> tuple:
     cen_line = []
@@ -121,10 +123,16 @@ def preprocess(cen_line: list, con_line_block: list) -> tuple:
     return cen_enc_in, con_enc_in, dec_in, dec_out
 	     
 def test(vocab_size: int, w_fn: str, d_fn: str) -> None:
-    pass
+    cen_line, con_line_block, label = load_data(d_fn)
+    model = DeepDLTransformer(vocab_size)
+    
+    model.load_weights(w_fn)
+    print(DeepDL(DeepDLTransformer(vocab_size))(cen_line, con_line_block))
+
 
 
 if __name__ == '__main__':
+    test(int(sys.argv[1]), sys.argv[2], sys.argv[3])
     main(sys.argv)
 
 
