@@ -35,7 +35,7 @@ public class DataCollector {
                    InterruptedException, FileFormatException {
         final String END_DATE = "2021-11-30";
         final float TRAIN_RATIO = 0.6F;
-
+        
         RevCommit splittingCommit;
         String[] elements = url.split("/");
         String repouser = elements[elements.length - 2];

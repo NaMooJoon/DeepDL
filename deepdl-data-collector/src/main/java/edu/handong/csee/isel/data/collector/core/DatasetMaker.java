@@ -382,7 +382,7 @@ public class DatasetMaker {
                 isExtension = line.endsWith("." + extension);
             } else if (isExtension && line.startsWith("---")) {
                 filename = line.substring(FILE_BEGIN_INDEX);
-            } else if (isExtension && !line.startsWith("+++")
+            } else if (isExtension && !line.startsWith("+++") 
                        && (line.startsWith("+") || line.startsWith(" "))
                        && !line.substring(1).isBlank()) {
                 addedAndMaintainedList.add(line);
