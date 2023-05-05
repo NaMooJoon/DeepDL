@@ -79,16 +79,15 @@ public class GitHubSearcher implements AutoCloseable {
     
     /**
      * Checkout to the snapshot of this instance's repository.
-     * The snapshot of the project refers to the latest commit state before the splitted commit.
-     * @param splittedCommit the splitted commit
+     * The snapshot refers to the project at the given spllitting commit.
+     * @param splittingCommit the splitting commit
      * @throws GitAPIException 
      */
-    public void checkoutToSnapshot(RevCommit splittedCommit) 
+    public void checkoutToSnapshot(RevCommit splittingCommit) 
             throws GitAPIException {
         git.checkout()
-           .setCreateBranch(true)
-           .setName("snapshot")
-           .setStartPoint(splittedCommit.getParents()[0])
+           .setName(splittingCommit.getName())
+           .setStartPoint(splittingCommit)
            .call();
     }
 
