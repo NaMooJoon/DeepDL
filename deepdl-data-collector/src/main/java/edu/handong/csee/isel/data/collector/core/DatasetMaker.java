@@ -111,7 +111,9 @@ public class DatasetMaker {
             removeBuggyLines(String.join(File.separator, 
                                          Utils.getProjectPath(), 
                                          "out", "snapshot", 
-                                         searcher.getRepouser(), key), 
+                                         searcher.getRepouser(), 
+                                         searcher.getRepository(),
+                                         key), 
                              buggyLines.get(key));
         }
     }
@@ -397,21 +399,23 @@ public class DatasetMaker {
     }
 
     /**
-     * Removes the given buggy lines from the file of the given path name.
-     * @param pathname the absolute path name 
+     * Removes the given buggy lines from the given file name.
+     * @param filename the absolute file name 
      * @param buggyLines the buggy lines
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void removeBuggyLines(String pathname, 
+    private void removeBuggyLines(String filename, 
                                   ArrayList<String> buggyLines) 
                                         throws FileNotFoundException, 
                                                IOException {
         final int THRESHOLD = 100;
                                                 
-        File file = new File(pathname);
+        System.out.printf("Removing buggy lines from %s\n", filename);
+        File file = new File(filename);
 
         if (!file.exists()) {
+            System.out.println("File does not exists.");
             return;
         }
 
@@ -420,13 +424,14 @@ public class DatasetMaker {
         try (BufferedReader reader = 
                 new BufferedReader(new FileReader(file))) {
             String line;
-            System.out.printf("file: %s\n", pathname);
             int lineCount = 1;
             while ((line = reader.readLine()) != null) {
                 if (!buggyLines.contains(line)) {
                     lines.add(line);
-                    System.out.printf("buggy line: line %d %s\n", lineCount++, line);
+                } else {
+                    System.out.printf("buggy line: line %d %s\n", lineCount, line);
                 }
+                lineCount++;
             }
         }
 
