@@ -85,40 +85,47 @@ def load_data(fn: str) -> tuple:
 
     return cen_line, con_line_block, label
 
-def preprocess(cen_line: list, con_line_block: list) -> tuple:
-    eol = cen_line[0][-1]
-    sos = con_line_block[0][0]
-    eos = con_line_block[0][-1]
+def preprocess(cen_lines: list, con_line_blocks: list) -> tuple:
+    eol = cen_lines[0][-1]
+    sos = con_line_blocks[0][0]
+    eos = con_line_blocks[0][-1]
+    padded_cen_lines = []
+    padded_con_line_blocks = []
     
-    for i in range(len(cen_line)):
-        if len(cen_line[i]) > CEN_SEQ_LEN or len(con_line_block[i]) > CON_SEQ_LEN:
-            cen_line.pop(i)
-            con_line_block.pop(i)
-        else:
-            for j in range(CEN_SEQ_LEN - len(cen_line[i])):
-                cen_line[i].append(0)
+    for i in range(len(cen_lines)):
+        if len(cen_lines[i]) <= CEN_SEQ_LEN 
+                and len(con_line_blocks[i]) <= CON_SEQ_LEN:
+            cen_line = cen_lines[i][:]
+            con_line_block = con_line_blocks[i][:]
+            
+            for j in range(CEN_SEQ_LEN - len(cen_line)):
+                cen_line.append(0)
+            
+            padded_cen_lines.add(cen_line)
 
-            for j in range(CON_SEQ_LEN - len(con_line_block[i])):
-                con_line_block[i].append(0)
+            for j in range(CON_SEQ_LEN - len(con_line_block)):
+                con_line_block.append(0)
+             
+            padded_con_line_blocks.add(con_line_block)    
                 
-    cen_enc_in = tf.constant(cen_line)
-    con_enc_in = tf.constant(con_line_block)
+    cen_enc_in = tf.constant(padded_cen_lines)
+    con_enc_in = tf.constant(padded_con_line_blocks)
     
-    for line in cen_line:
+    for line in padded_cen_lines:
         idx = line.index(eol)
         
         line.pop(idx)
         line.insert(idx, eos)
     
-    dec_out = tf.constant(cen_line)
+    dec_out = tf.constant(padded_cen_lines)
     
-    for line in cen_line:
+    for line in padded_cen_lines:
         idx = line.index(eos)
         
         line.pop(idx)
         line.insert(0, sos)
     
-    dec_in = tf.constant(cen_line)
+    dec_in = tf.constant(padded_cen_lines)
     
     return cen_enc_in, con_enc_in, dec_in, dec_out
 	     
