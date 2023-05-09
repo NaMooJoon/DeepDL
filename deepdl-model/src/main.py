@@ -93,20 +93,20 @@ def preprocess(cen_lines: list, con_line_blocks: list) -> tuple:
     padded_con_line_blocks = []
     
     for i in range(len(cen_lines)):
-        if len(cen_lines[i]) <= CEN_SEQ_LEN 
-                and len(con_line_blocks[i]) <= CON_SEQ_LEN:
+        if (len(cen_lines[i]) <= CEN_SEQ_LEN 
+                and len(con_line_blocks[i]) <= CON_SEQ_LEN):
             cen_line = cen_lines[i][:]
             con_line_block = con_line_blocks[i][:]
             
             for j in range(CEN_SEQ_LEN - len(cen_line)):
                 cen_line.append(0)
             
-            padded_cen_lines.add(cen_line)
+            padded_cen_lines.append(cen_line)
 
             for j in range(CON_SEQ_LEN - len(con_line_block)):
                 con_line_block.append(0)
              
-            padded_con_line_blocks.add(con_line_block)    
+            padded_con_line_blocks.append(con_line_block)    
                 
     cen_enc_in = tf.constant(padded_cen_lines)
     con_enc_in = tf.constant(padded_con_line_blocks)
