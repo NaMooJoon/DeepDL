@@ -59,6 +59,7 @@ class DeepDLTransformer(tf.keras.Model):
 
   def call(self, inputs, training=None, mask=None, use_attn_out=False):
     cen_enc_in, con_enc_in, dec_in = inputs
+    dec_padding_mask = self.create_padding_mask(dec_in)
     
     if not use_attn_out: 
       self.cen_enc_padding_mask = self.create_padding_mask(cen_enc_in)
@@ -76,7 +77,9 @@ class DeepDLTransformer(tf.keras.Model):
                                            use_causal_mask=False)  # (batchsize, cen_in_seq_len, d_model) 
     
     dec_out, attn_w_dict = self.decoder(dec_in, self.attn_out, 
-                                        training, self.cen_enc_padding_mask)  # dec_output.shape == (batch_size, dec_in_seq_len, d_model)
+                                        training, 
+                                        self.cen_enc_padding_mask,
+                                        dec_padding_mask)  # dec_output.shape == (batch_size, dec_in_seq_len, d_model)
     linear_out = self.linear_layer(dec_out)  # (batch_size, dec_in_seq_len, target_vocab_size)
     out = tf.math.softmax(linear_out, axis=2)
 
@@ -149,10 +152,10 @@ class DeepDL(tf.Module):
     
     while True:
       n_iter += 1
-      out = self.model([cen_enc_in, con_enc_in, dec_in], 
-                       training=False, 
-                       use_attn_out=False if n_iter == 1 else True)
-      last_seq_id = tf.math.argmax(out[0, -1, :], axis=2, output_type=tf.int32)
+      out, _ = self.model([cen_enc_in, con_enc_in, dec_in], 
+                          training=False, 
+                          use_attn_out=False if n_iter == 1 else True)
+      last_seq_id = tf.math.argmax(out[:, -1:, :], axis=2, output_type=tf.int32)
       
       if last_seq_id[0][0] == self.end_id:
         break
@@ -160,7 +163,7 @@ class DeepDL(tf.Module):
       entropy -= np.log(out[0][-1][last_seq_id[0][0]])
       dec_in = tf.concat([dec_in, last_seq_id], axis=1)  
     
-    return (cen_line[0], tf.make_ndarray(dec_in[0][1:]).tolist(), 
+    return (cen_line[0], dec_in[0][1:].numpy().tolist(), 
             entropy if n_iter == 1 else entropy / (n_iter - 1))
   
   def evaluate(self, X, Y):
