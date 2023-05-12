@@ -1,11 +1,11 @@
 import os
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 from operator import itemgetter
 from transformer import Encoder, Decoder, TransformerAccuracy
-from utils import getpd
+from utils import getpd, topk, RR, AP
 
 class DeepDLConfig():
   
@@ -19,7 +19,7 @@ class DeepDLConfig():
     self.__accuracy = TransformerAccuracy()
     self.__model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
         os.path.join(getpd(), 
-                     "out", rn, "weigths.{epoch:02d}-{val_loss:.2f}.hdf5"),
+                     "out", rn, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
         verbose=1, 
         save_best_only=True,
         save_weights_only=True)
@@ -97,34 +97,112 @@ class DeepDL(tf.Module):
     self.start_id = start_id
     self.end_id = end_id
     
-  def __call__(self, cent_line, contxt_line_block):
+  def __call__(self, X):
+    '''
+    Calls DeepDL with the given data.
+    
+    Args: 
+      x (list): The data that consists of tokenized central lines 
+                and contexutal line blocks that padding does not added. 
+                            
+    Returns:
+      list: Calculated results that consists tuples of index number, 
+            central line, generated tokens, and line entropy.
+            The calculated results are sorted by the line entropy 
+            in descending order.          
+    '''
+    
+    cen_lines, con_line_blocks = X
     res = []
     
-    for i in range(cent_line.shape[0]):
-      res.append(calculate(cent_line[i, :], contxt_line_block[i, :]))  
+    for i in range(len(cen_lines)):
+      res.append((i, ) + self._calculate([cen_lines[i]], [con_line_blocks[i]]))  
 
-    res.sort(key=itemgetter(2), reverse=True)
+    res.sort(key=itemgetter(3), reverse=True)
     
     return res
   
-  def calculate(self, cent_line, contxt_line_block):
+  def _calculate(self, cen_line, con_line_block):
+    '''
+    Generates code line and calculates the line entropy with 
+    the given tokenized central line and contextaul line block.
+    
+    Args:
+      cen_line (list): The tokenized central line.
+                       It expects to receive 2D central line that
+                       padding does not added.
+      con_line_block (list): The tokenized contextual line block.
+                             It expects to receive 
+                             2D contexutal line block that 
+                             padding does not added.
+        
+    Retruns:
+      tuple: Calculated result that consists of central line, 
+             the generated tokens, and the line entropy.
+    '''
+    
+    cen_enc_in = tf.constant(cen_line)
+    con_enc_in = tf.constant(con_line_block)
     dec_in = tf.constant([[self.start_id]])
     entropy = 0.0
+    n_iter = 0
     
     while True:
-      out = self.model([cent_line, contxt_line_block, dec_in], False, 
-                        False if i == 0 else True)
-      last_seq_id = tf.math.argmax(out[0, -1, :], axis=2)
+      n_iter += 1
+      out = self.model([cen_enc_in, con_enc_in, dec_in], 
+                       training=False, 
+                       use_attn_out=False if n_iter == 1 else True)
+      last_seq_id = tf.math.argmax(out[0, -1, :], axis=2, output_type=tf.int32)
       
       if last_seq_id[0][0] == self.end_id:
         break
       
-      entropy -= np.log2(out[0][-1][last_seq_id[0][0]])
+      entropy -= np.log(out[0][-1][last_seq_id[0][0]])
       dec_in = tf.concat([dec_in, last_seq_id], axis=1)  
     
-    return cent_line[0], dec_in[1:], entropy
+    return (cen_line[0], tf.make_ndarray(dec_in[0][1:]).tolist(), 
+            entropy if n_iter == 1 else entropy / (n_iter - 1))
   
-  
+  def evaluate(self, X, Y):
+    '''
+    Evaluates this module with the given commit data and labels.
+    The evaluation metrics are top-k accuracy, MRR, and MAP.
+    
+    Args: 
+      x (list): The commit data. 
+                It expects list that consists of list of central lines 
+                and the list of contextual line blocks 
+                which are both divided by commits without padding.   
+      y (list): The labels which are divided by commits.
+      
+    Returns:
+      tuple: The evaluation of this module 
+             which consists of top-1 accuracy, top-5 accuracy, MRR and MAP.
+      None: None if labels of some commit do not contain True value.
+    '''
+    
+    try:
+      cen_lines, con_line_blocks = X
+      total_top1 = 0.0
+      total_top5 = 0.0
+      total_rr = 0.0
+      total_ap = 0.0
+
+      for i in range(len(cen_lines)):
+        out = self([cen_lines[i], con_line_blocks[i]])
+        total_top1 += topk(out, Y[i], 1)
+        total_top5 += topk(out, Y[i], 5)
+        total_rr += RR(out, Y[i])
+        total_ap += AP(out, Y[i])
+    
+      return (total_top1 / len(cen_lines), total_top5 / len(cen_lines), 
+              total_rr / len(cen_lines), total_ap / len(cen_lines))
+    except Exception as e:
+      print(e)
+      
+      return None
+    
+    
 class DeepDLLoss(tf.keras.losses.Loss):
   
   def __init__(self, name=None):
