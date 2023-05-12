@@ -51,11 +51,11 @@ def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
     if not os.path.exists(dn):
         os.mkdir(dn)
     
-    cen_line, con_line_block, _ = load_data(fn)
+    cen_lines, con_line_blocks, _ = load_data(fn)
     
     with tf.distribute.MirroredStrategy().scope():
-        cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_line, 
-                                                             con_line_block)
+        cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_lines, 
+                                                             con_line_blocks)
         config = DeepDLConfig(rn, len(cen_enc_in), batch_size)
         model = DeepDLTransformer(vocab_size)
         
@@ -65,11 +65,12 @@ def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:
                   batch_size=batch_size, epochs=epochs, 
                   callbacks=[config.model_checkpoint],
                   validation_split=0.1)
-
+   
+    
 def load_data(fn: str) -> tuple:
-    cen_line = []
-    con_line_block = []
-    label = []
+    cen_lines = []
+    con_line_blocks = []
+    labels = []
 	
     with open(fn, newline='') as f:
         reader = csv.reader(f)
@@ -77,13 +78,12 @@ def load_data(fn: str) -> tuple:
         next(reader)
     
         for row in reader:
-            cen_line.append(json.loads(row[0]))
-            con_line_block.append(json.loads(row[1]))  
-            
-            if len(row) > 2:
-                label.append(row[2] == 'True')
+            cen_lines.append(json.loads(row[0]))
+            con_line_blocks.append(json.loads(row[1]))  
+            labels.append(row[2] == 'True')
 
-    return cen_line, con_line_block, label
+    return cen_lines, con_line_blocks, labels
+
 
 def preprocess(cen_lines: list, con_line_blocks: list) -> tuple:
     eol = cen_lines[0][-1]
@@ -128,19 +128,52 @@ def preprocess(cen_lines: list, con_line_blocks: list) -> tuple:
     dec_in = tf.constant(padded_cen_lines)
     
     return cen_enc_in, con_enc_in, dec_in, dec_out
-	     
-def test(vocab_size: int, w_fn: str, d_fn: str) -> None:
-    cen_line, con_line_block, label = load_data(d_fn)
+	
+      
+def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
+    '''
+    Tests the trained model with the given vocabulary size, 
+    model weight file name, and test data directory name. 
+    Top-k accuracy, MAP, MRR of the trained model is printed.
+    
+    Args:
+        vocab_size (int): The vocabulary size.
+        w_fn (str): The model weight file name.
+        d_dn (str): The test data directory name.
+    '''
+    
+    list_cen_lines = []
+    list_con_line_blocks = []
+    list_labels = []
+    
+    for fn in os.listdir(d_dn):
+        cen_lines, con_line_blocks, labels = load_data(os.path.join(d_dn, fn))
+        list_cen_lines.append(cen_lines)
+        list_con_line_blocks.append(con_line_blocks)
+        list_labels.append(labels)
+    
+    sos = list_con_line_blocks[0][0][0]
+    eos = list_con_line_blocks[0][0][-1]        
+    cen_line = list_cen_lines[0][0].copy()
+    
+    cen_line.insert(0, sos)
+    cen_line.pop()
+    
     model = DeepDLTransformer(vocab_size)
     
+    model([tf.constant([list_cen_lines[0][0]]), 
+           tf.constant([list_con_line_blocks[0][0]]), 
+           tf.constant([cen_line])], training=False)
     model.load_weights(w_fn)
-    print(DeepDL(DeepDLTransformer(vocab_size))(cen_line, con_line_block))
+    
+    top1_acc, top5_acc, mrr, map_ = DeepDL(model, sos, eos).evaluate(
+            [list_cen_lines, list_con_line_blocks], list_labels)
 
+    print(f'top1 accuracy: {top1_acc}\ntop5 accuracy: {top5_acc}'
+          + f'MRR: {mrr}\nMAP: {map_}', sep='\n')
 
 
 if __name__ == '__main__':
-    test(int(sys.argv[1]), sys.argv[2], sys.argv[3])
     main(sys.argv)
-
 
 
