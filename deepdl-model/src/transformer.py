@@ -85,11 +85,11 @@ class DecoderLayer(tf.keras.layers.Layer):
     self.dropout2 = tf.keras.layers.Dropout(rate)
     self.dropout3 = tf.keras.layers.Dropout(rate)
 
-  def call(self, x, enc_output, training, mask):  # modified: remove param look_ahead_mask
+  def call(self, x, enc_output, training, enc_mask, dec_mask):  # modified: remove param look_ahead_mask
     # enc_output.shape == (batch_size, input_seq_len, d_model)
 
     # modified: calling tf.keras.MultiHeadAttention
-    attn1, attn_weights_block1 = self.mha1(x, x, x, mask,                            
+    attn1, attn_weights_block1 = self.mha1(x, x, x, dec_mask,                            
                                            return_attention_scores=True, 
                                            training=training, 
                                            use_causal_mask=True)  # (batch_size, target_seq_len, d_model) 
@@ -97,7 +97,8 @@ class DecoderLayer(tf.keras.layers.Layer):
     out1 = self.layernorm1(attn1 + x)
 
     # modified: calling tf.keras.MultiHeadAttention
-    attn2, attn_weights_block2 = self.mha2(out1, enc_output, enc_output, mask, 
+    attn2, attn_weights_block2 = self.mha2(out1, enc_output, enc_output, 
+                                           enc_mask, 
                                            return_attention_scores=True, 
                                            training=training, 
                                            use_causal_mask=False)  # (batch_size, target_seq_len, d_model)
@@ -162,7 +163,7 @@ class Decoder(tf.keras.layers.Layer):
                        for _ in range(num_layers)]
     self.dropout = tf.keras.layers.Dropout(rate)
 
-  def call(self, x, enc_output, training, mask): # modified: remove param look_ahead_mask
+  def call(self, x, enc_output, training, enc_mask, dec_mask): # modified: remove param look_ahead_mask
     seq_len = tf.shape(x)[1]
     attention_weights = {}
 
@@ -173,7 +174,8 @@ class Decoder(tf.keras.layers.Layer):
     x = self.dropout(x, training=training)
 
     for i in range(self.num_layers):
-      x, block1, block2 = self.dec_layers[i](x, enc_output, training, mask) # modified: remove arg look_ahead_mask
+      x, block1, block2 = self.dec_layers[i](x, enc_output, training, 
+                                             enc_mask, dec_mask) # modified: remove arg look_ahead_mask
 
       attention_weights[f'decoder_layer{i+1}_block1'] = block1
       attention_weights[f'decoder_layer{i+1}_block2'] = block2
