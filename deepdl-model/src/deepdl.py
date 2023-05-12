@@ -44,17 +44,17 @@ class DeepDLConfig():
 class DeepDLTransformer(tf.keras.Model):
   
   def __init__(self, vocab_size, num_layers=6, d_model=512, num_heads=8, 
-               dff=2048, pe_cent=160, pe_contxt=640, rate=0.1):
+               dff=2048, pe_cen_enc=160, pe_con_enc=640, pe_dec=640, rate=0.1):
     super(DeepDLTransformer, self).__init__()
     
     self.central_encoder = Encoder(num_layers, d_model, num_heads, dff,
-                                   vocab_size, pe_cent, rate)
+                                   vocab_size, pe_cen_enc, rate)
     self.contextual_encoder = Encoder(num_layers, d_model, num_heads, dff,
-                                      vocab_size, pe_contxt, rate)
+                                      vocab_size, pe_con_enc, rate)
     self.attention_layer = tf.keras.layers.MultiHeadAttention(
         num_heads, d_model // num_heads)
     self.decoder = Decoder(num_layers, d_model, num_heads, dff,
-                           vocab_size, pe_cent, rate)
+                           vocab_size, pe_dec, rate)
     self.linear_layer = tf.keras.layers.Dense(vocab_size)
 
   def call(self, inputs, training=None, mask=None, use_attn_out=False):
