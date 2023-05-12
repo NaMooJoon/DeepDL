@@ -42,6 +42,9 @@ def main(argv: list) -> None:
     
     if argv[2] == '-tr':
         train(int(argv[1]), os.path.normpath(argv[3]), BATCH_SIZE, EPOCHS)
+    elif argv[2] == '-ts':
+        test(int(argv[1]), 
+             os.path.normpath(argv[3]), os.path.normpath(argv[4]))
     
      
 def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:    
