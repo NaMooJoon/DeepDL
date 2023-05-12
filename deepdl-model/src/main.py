@@ -83,7 +83,7 @@ def load_data(fn: str) -> tuple:
         for row in reader:
             cen_lines.append(json.loads(row[0]))
             con_line_blocks.append(json.loads(row[1]))  
-            labels.append(row[2] == 'True')
+            labels.append(row[2] == 'true')
 
     return cen_lines, con_line_blocks, labels
 
@@ -162,18 +162,21 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
     cen_line.insert(0, sos)
     cen_line.pop()
     
-    model = DeepDLTransformer(vocab_size)
-    
-    model([tf.constant([list_cen_lines[0][0]]), 
-           tf.constant([list_con_line_blocks[0][0]]), 
-           tf.constant([cen_line])], training=False)
-    model.load_weights(w_fn)
-    
-    top1_acc, top5_acc, mrr, map_ = DeepDL(model, sos, eos).evaluate(
-            [list_cen_lines, list_con_line_blocks], list_labels)
+    with tf.distribute.MultiWorkerMirroredStrategy():
+        model = DeepDLTransformer(vocab_size)
+        
+        model([tf.constant([list_cen_lines[0][0]]), 
+            tf.constant([list_con_line_blocks[0][0]]), 
+            tf.constant([cen_line])], training=False)
+        model.load_weights(w_fn)
+        
+        top1_acc, top5_acc, mrr, map_ = DeepDL(model, sos, eos).evaluate(
+                [list_cen_lines, list_con_line_blocks], list_labels)
 
-    print(f'top1 accuracy: {top1_acc}\ntop5 accuracy: {top5_acc}'
-          + f'MRR: {mrr}\nMAP: {map_}', sep='\n')
+        print(f'top1 accuracy: {top1_acc}')
+        print(f'top5 accuracy: {top5_acc}')
+        print(f'MRR: {mrr}')
+        print(f'MAP: {map_}')
 
 
 if __name__ == '__main__':
