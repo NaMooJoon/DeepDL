@@ -44,9 +44,10 @@ class DeepDLConfig():
 class DeepDLTransformer(tf.keras.Model):
   
   def __init__(self, vocab_size, num_layers=6, d_model=512, num_heads=8, 
-               dff=2048, pe_cen_enc=160, pe_con_enc=640, pe_dec=640, rate=0.1):
+               dff=2048, pe_cen_enc=160, pe_con_enc=640, pe_dec=160, rate=0.1):
     super(DeepDLTransformer, self).__init__()
     
+    self.__pe_dec = pe_dec
     self.central_encoder = Encoder(num_layers, d_model, num_heads, dff,
                                    vocab_size, pe_cen_enc, rate)
     self.contextual_encoder = Encoder(num_layers, d_model, num_heads, dff,
@@ -148,13 +149,11 @@ class DeepDL(tf.Module):
     con_enc_in = tf.constant(con_line_block)
     dec_in = tf.constant([[self.start_id]])
     entropy = 0.0
-    n_iter = 0
     
-    while True:
-      n_iter += 1
+    for i in range(self.model.__pe_dec):
       out, _ = self.model([cen_enc_in, con_enc_in, dec_in], 
                           training=False, 
-                          use_attn_out=False if n_iter == 1 else True)
+                          use_attn_out=False if i == 0 else True)
       last_seq_id = tf.math.argmax(out[:, -1:, :], axis=2, output_type=tf.int32)
       
       if last_seq_id[0][0] == self.end_id:
@@ -164,7 +163,8 @@ class DeepDL(tf.Module):
       dec_in = tf.concat([dec_in, last_seq_id], axis=1)  
     
     return (cen_line[0], dec_in[0][1:].numpy().tolist(), 
-            entropy if n_iter == 1 else entropy / (n_iter - 1))
+            entropy if dec_in.shape[1] == 1 
+                    else entropy / (dec_in.shape[1] - 1))
   
   def evaluate(self, X, Y):
     '''
