@@ -93,6 +93,10 @@ class DeepDLTransformer(tf.keras.Model):
     # to the attention logits.
     return seq[:, tf.newaxis, tf.newaxis, :]  # (batch_size, 1, 1, seq_len)
   
+  @property
+  def pe_dec(self):
+    return self.__pe_dec
+  
 
 class DeepDL(tf.Module):
    
@@ -150,7 +154,7 @@ class DeepDL(tf.Module):
     dec_in = tf.constant([[self.start_id]])
     entropy = 0.0
     
-    for i in range(self.model.__pe_dec):
+    for i in range(self.model.pe_dec):
       out, _ = self.model([cen_enc_in, con_enc_in, dec_in], 
                           training=False, 
                           use_attn_out=False if i == 0 else True)
