@@ -18,11 +18,12 @@ import csv
 import json
 import os
 import sys
+from nbformat import convert
 
 import tensorflow as tf
 
 from deepdl import DeepDLConfig, DeepDLTransformer, DeepDL
-from utils import getpd
+from utils import getpd, convert_to_dataframe
 
 EPOCHS = 50
 BATCH_SIZE = 16
@@ -170,13 +171,19 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
             tf.constant([cen_line])], training=False)
         model.load_weights(w_fn)
         
-        top1_acc, top5_acc, mrr, map_ = DeepDL(model, sos, eos).evaluate(
+        top1_acc, top5_acc, mrr, map_, predictions = DeepDL(model, sos, eos).evaluate(
                 [list_cen_lines, list_con_line_blocks], list_labels)
 
         print(f'top1 accuracy: {top1_acc}')
         print(f'top5 accuracy: {top5_acc}')
         print(f'MRR: {mrr}')
         print(f'MAP: {map_}')
+    
+        df = convert_to_dataframe(predictions, list_labels)
+        df_path = os.path.join(getpd(), 'out', w_fn.split(os.sep)[-1])
+            
+        os.makedirs(df_path)
+        df.to_csv(os.path.join(df_path, 'plot_data.csv'))
 
 
 if __name__ == '__main__':
