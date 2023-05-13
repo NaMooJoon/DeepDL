@@ -1,9 +1,13 @@
 import os
+from matplotlib.axes import Axes
 
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 from enum import Enum
 from pandas import DataFrame
+
+from utils import getpd
 
 PROJECT_NAME = 'deepdl-model'
 
@@ -136,7 +140,7 @@ def convert_to_dataframe(Y_pred: list, Y_true: list) -> DataFrame:
 	return DataFrame(data=data, columns=['Label', 'Length', 'Entropy'])
 
   
-def plot(data: DataFrame, ptype: PlotType) -> None:
+def plot(data: DataFrame, ptype: PlotType) -> Axes:
 	'''
 	Plots the given data into the given type.
 	
@@ -146,16 +150,16 @@ def plot(data: DataFrame, ptype: PlotType) -> None:
         				  consists of label, length of generated tokens, 
               			  and line entorpy.
 		ptype (PlotType): The plot type.
+
+	Returns:
+		Axes:
 	'''
-	
+	 
 	if ptype == PlotType.LABEL_ENTROPY: 
-		sns.kdeplot(data=data, x='Entropy', hue='Label')
+		return sns.kdeplot(data=data, x='Entropy', hue='Label')
 	elif ptype == PlotType.LABEL_LENGTH:
-		sns.kdeplot(data=data, x='LENGTH', hue='LABEL')
+		return sns.kdeplot(data=data, x='Length', hue='Label')
 	else:
-		sns.jointplot(data=data, x='LENGTH', y='ENTROPY', hue='LABEL')
+		return sns.jointplot(data=data, x='Length', y='Entropy', hue='Label')
 
 	
-    
-  
-  
