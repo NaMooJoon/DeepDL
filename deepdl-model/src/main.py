@@ -18,12 +18,11 @@ import csv
 import json
 import os
 import sys
-from nbformat import convert
 
 import tensorflow as tf
 
 from deepdl import DeepDLConfig, DeepDLTransformer, DeepDL
-from utils import getpd, convert_to_dataframe
+from utils import PlotType, getpd, convert_to_dataframe, plot
 
 EPOCHS = 50
 BATCH_SIZE = 16
@@ -163,7 +162,7 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
     cen_line.insert(0, sos)
     cen_line.pop()
     
-    with tf.distribute.MultiWorkerMirroredStrategy():
+    with tf.distribute.MultiWorkerMirroredStrategy().scope():
         model = DeepDLTransformer(vocab_size)
         
         model([tf.constant([list_cen_lines[0][0]]), 
@@ -180,11 +179,27 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
         print(f'MAP: {map_}')
     
         df = convert_to_dataframe(predictions, list_labels)
-        df_path = os.path.join(getpd(), 'out', w_fn.split(os.sep)[-1])
-            
-        os.makedirs(df_path)
-        df.to_csv(os.path.join(df_path, 'plot_data.csv'))
-
+        repository = w_fn.split('/')[-1]
+        ax = plot(df, PlotType.LABEL_ENTROPY)
+        
+        ax.get_figure().savefig(os.path.join(getpd(), 
+                                             'out', 'plot', 
+                                             repository, 
+                                             'LABEL_ENTROPY.png'))
+        
+        ax = plot(df, PlotType.LABEL_LENGTH)
+        
+        ax.get_figure().savefig(os.path.join(getpd(), 
+                                             'out', 'plot', 
+                                             repository, 
+                                             'LABEL_LENGTH.png'))
+        
+        ax = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
+        
+        ax.get_figure().savefig(os.path.join(getpd(), 
+                                             'out', 'plot', 
+                                             repository, 
+                                             'LABEL_LENGTH_ENTROPY.png'))
 
 if __name__ == '__main__':
     main(sys.argv)
