@@ -179,26 +179,21 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
         print(f'MAP: {map_}')
     
         df = convert_to_dataframe(predictions, list_labels)
-        repository = w_fn.split('/')[-1]
+        repo_path = os.path.join(getpd(), 'out', 'plot', w_fn.split(os.sep)[-2])
+        
+        os.makedirs(repo_path)
+        
         ax = plot(df, PlotType.LABEL_ENTROPY)
         
-        ax.get_figure().savefig(os.path.join(getpd(), 
-                                             'out', 'plot', 
-                                             repository, 
-                                             'LABEL_ENTROPY.png'))
+        ax.get_figure().savefig(os.path.join(repo_path, 'LABEL_ENTROPY.png'))
         
         ax = plot(df, PlotType.LABEL_LENGTH)
         
-        ax.get_figure().savefig(os.path.join(getpd(), 
-                                             'out', 'plot', 
-                                             repository, 
-                                             'LABEL_LENGTH.png'))
+        ax.get_figure().savefig(os.path.join(repo_path, 'LABEL_LENGTH.png'))
         
         ax = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
         
-        ax.get_figure().savefig(os.path.join(getpd(), 
-                                             'out', 'plot', 
-                                             repository, 
+        ax.get_figure().savefig(os.path.join(repo_path, 
                                              'LABEL_LENGTH_ENTROPY.png'))
 
 if __name__ == '__main__':
