@@ -181,7 +181,7 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
         df = convert_to_dataframe(predictions, list_labels)
         repo_path = os.path.join(getpd(), 'out', 'plot', w_fn.split(os.sep)[-2])
         
-        os.makedirs(repo_path)
+        os.makedirs(repo_path, exist_ok=True)
         
         ax = plot(df, PlotType.LABEL_ENTROPY)
         
@@ -191,10 +191,9 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
         
         ax.get_figure().savefig(os.path.join(repo_path, 'LABEL_LENGTH.png'))
         
-        ax = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
+        grid = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
         
-        ax.get_figure().savefig(os.path.join(repo_path, 
-                                             'LABEL_LENGTH_ENTROPY.png'))
+        grid.savefig(os.path.join(repo_path, 'LABEL_LENGTH_ENTROPY.png'))
 
 if __name__ == '__main__':
     main(sys.argv)
