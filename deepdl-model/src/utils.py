@@ -1,13 +1,13 @@
 import os
-from matplotlib.axes import Axes
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from enum import Enum
+from matplotlib.pyplot import Axes
 from pandas import DataFrame
-
-from utils import getpd
+from seaborn import JointGrid
+from typing import Union
 
 PROJECT_NAME = 'deepdl-model'
 
@@ -140,26 +140,26 @@ def convert_to_dataframe(Y_pred: list, Y_true: list) -> DataFrame:
 	return DataFrame(data=data, columns=['Label', 'Length', 'Entropy'])
 
   
-def plot(data: DataFrame, ptype: PlotType) -> Axes:
-	'''
-	Plots the given data into the given type.
+def plot(data: DataFrame, ptype: PlotType) -> Union[Axes, JointGrid]:
+    '''
+    Plots the given type of figure by using the given data.
 	
 	Args:
 		data (DataFrame): The data.
 						  It expects the data that 
         				  consists of label, length of generated tokens, 
               			  and line entorpy.
-		ptype (PlotType): The plot type.
-
-	Returns:
-		Axes:
-	'''
-	 
-	if ptype == PlotType.LABEL_ENTROPY: 
-		return sns.kdeplot(data=data, x='Entropy', hue='Label')
-	elif ptype == PlotType.LABEL_LENGTH:
-		return sns.kdeplot(data=data, x='Length', hue='Label')
-	else:
-		return sns.jointplot(data=data, x='Length', y='Entropy', hue='Label')
-
-	
+        ptype (PlotType): The plot type.
+    
+    Returns:
+        Axes: The plotted Axes.
+        JointGrid: The plotted JointGrid.
+    '''
+        
+    if ptype == PlotType.LABEL_ENTROPY: 
+        return sns.kdeplot(data=data, x='Entropy', hue='Label')
+    elif ptype == PlotType.LABEL_LENGTH:
+        return sns.kdeplot(data=data, x='Length', hue='Label')
+    else:
+        return sns.jointplot(data=data, x='Length', y='Entropy', hue='Label')
+    
