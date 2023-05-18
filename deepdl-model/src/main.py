@@ -28,38 +28,49 @@ EPOCHS = 50
 BATCH_SIZE = 16
 CEN_SEQ_LEN = 160
 CON_SEQ_LEN = 4 * CEN_SEQ_LEN
+DUMMY_DATA = tf.constant([[0]]) 
 
-def main(argv: list) -> None:
-    if len(argv) < 4 or (argv[1] == '-ts' and len(argv) < 5):
-        print('usage: python main.py <vocab-size>',
-              '<path-to-train-data-file> <path-to-test-data-file>')
+def main(argv: list) -> None:    
+    if argv[2] == '-tr' and len(argv) >= 4:
+        if len(argv) == 4:
+            train(int(argv[1]), argv[3], BATCH_SIZE, EPOCHS)
+        else:
+            train(int(argv[1]), argv[3], BATCH_SIZE, EPOCHS, argv[4])
+    elif argv[2] == '-ts' and len(argv) >= 5:
+        if len(argv) == 5:
+            test(int(argv[1]), argv[3], argv[4])
+        else:
+            test(int(argv[1]), argv[3], argv[4], argv[5])
+    elif argv[2] == '-a' and len(argv) >= 5:
+        if len(argv) == 5:
+            applicate(int(argv[1]), argv[3], argv[4])
+        else:
+            applicate(int(argv[1]), argv[3], argv[4], argv[5])
+    else:
+        print('usage: python main.py <vocab-size>', 
+              '-tr <path-to-train-data-file>', 
+              '<model-weight-output-file-path>')
         print('       python main.py <vocab-size>', 
-              '-tr <path-to-data-file>')
+              '-ts <path-to-model-weight-file>' '<path-to-test-data-file>',
+              '<plot-output-file-path>')
         print('       python main.py <vocab-size>', 
-              '-ts <path-to-model-weight-file>', '<path-to-data-file>')
+              '-a <path-to-model-weight-file> <path-to-application-data-file>',
+              '<ranking-output-file-path>')
 
-        return
-    
-    if argv[2] == '-tr':
-        train(int(argv[1]), os.path.normpath(argv[3]), BATCH_SIZE, EPOCHS)
-    elif argv[2] == '-ts':
-        test(int(argv[1]), 
-             os.path.normpath(argv[3]), os.path.normpath(argv[4]))
-    
      
-def train(vocab_size: int, fn: str, batch_size : int, epochs: int) -> None:    
-    rn = fn.split(os.sep)[-2]
-    dn = os.path.join(getpd(), 'out', rn)
+def train(vocab_size: int, d_fn: str, batch_size : int, epochs: int, 
+          o_fp: str = None) -> None:    
+    if o_fp == None:
+        o_fp = os.path.join(getpd(), 'out', 'weights', d_fn.split(os.sep)[-2])
+
+    os.makedirs(o_fp, exist_ok=True)
     
-    if not os.path.exists(dn):
-        os.mkdir(dn)
-    
-    cen_lines, con_line_blocks, _ = load_data(fn)
+    cen_lines, con_line_blocks, _ = load_data(d_fn)
     
     with tf.distribute.MirroredStrategy().scope():
         cen_enc_in, con_enc_in, dec_in, dec_out = preprocess(cen_lines, 
                                                              con_line_blocks)
-        config = DeepDLConfig(rn, len(cen_enc_in), batch_size)
+        config = DeepDLConfig(o_fp, len(cen_enc_in), batch_size)
         model = DeepDLTransformer(vocab_size)
         
         model.compile(optimizer=config.optimizer, loss=config.loss, 
@@ -133,21 +144,31 @@ def preprocess(cen_lines: list, con_line_blocks: list) -> tuple:
     return cen_enc_in, con_enc_in, dec_in, dec_out
 	
       
-def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
+def test(vocab_size: int, w_fn: str, d_dn: str, o_fp: str = None) -> None:
     '''
-    Tests the trained model with the given vocabulary size, 
-    model weight file name, and test data directory name. 
-    Top-k accuracy, MAP, MRR of the trained model is printed.
+    Tests the trained model of the given weight file 
+    with the given vocabulary size and all of the test data  
+    in the given test data directory. 
+    Top-k accuracy, MAP, MRR of the trained model is printed
+    and plots are saved to the given output file path. 
+    If the output file path is none, 
+    the plots are saved in out/plots/repository.  
     
     Args:
         vocab_size (int): The vocabulary size.
         w_fn (str): The model weight file name.
         d_dn (str): The test data directory name.
+        o_fp (str, optional): The output file path.
     '''
     
     list_cen_lines = []
     list_con_line_blocks = []
     list_labels = []
+    
+    if o_fp == None: 
+        o_fp = os.path.join(getpd(), 'out', 'plots', w_fn.split(os.sep)[-2])
+        
+    os.makedirs(o_fp, exist_ok=True)
     
     for fn in os.listdir(d_dn):
         cen_lines, con_line_blocks, labels = load_data(os.path.join(d_dn, fn))
@@ -177,24 +198,69 @@ def test(vocab_size: int, w_fn: str, d_dn: str) -> None:
         print(f'top5 accuracy: {top5_acc}')
         print(f'MRR: {mrr}')
         print(f'MAP: {map_}')
-    
-        df = convert_to_dataframe(predictions, list_labels)
-        repo_path = os.path.join(getpd(), 'out', 'plot', w_fn.split(os.sep)[-2])
-        
-        os.makedirs(repo_path, exist_ok=True)
-        
-        ax = plot(df, PlotType.LABEL_ENTROPY)
-        
-        ax.get_figure().savefig(os.path.join(repo_path, 'LABEL_ENTROPY.png'))
-        
-        ax = plot(df, PlotType.LABEL_LENGTH)
-        
-        ax.get_figure().savefig(os.path.join(repo_path, 'LABEL_LENGTH.png'))
-        
-        grid = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
-        
-        grid.savefig(os.path.join(repo_path, 'LABEL_LENGTH_ENTROPY.png'))
 
+    df = convert_to_dataframe(predictions, list_labels)
+    
+    ax = plot(df, PlotType.LABEL_ENTROPY)
+    
+    ax.get_figure().savefig(os.path.join(o_fp, 'LABEL_ENTROPY.png'))
+    ax.clear()
+    
+    ax = plot(df, PlotType.LABEL_LENGTH)
+    
+    ax.get_figure().savefig(os.path.join(o_fp, 'LABEL_LENGTH.png'))
+    ax.clear()
+    
+    grid = plot(df, PlotType.LABEL_LENGTH_ENTROPY)
+    
+    grid.savefig(os.path.join(o_fp, 'LABEL_LENGTH_ENTROPY.png'))
+    grid.clear()
+
+ 
+def applicate(vocab_size: int, w_fn: str, d_fn: str, o_fp: str = None) -> None:
+    '''
+    Applicates the DeepDL to the given data file 
+    with the given vocabulary size and weight file, 
+    and saves the ranking csv file in the given output file path.
+    If the output file path is None, 
+    the ranking csv file is saved in out/rankings/repository.
+    
+    Args:
+        vocab_size (int): The vocabulary size.
+        w_fn (str): The weight file name.
+        d_fn (str): The data file name.
+        o_fp (str, optional): The output file path.
+    '''
+    
+    path_elements = d_fn.split(os.sep)
+    hash = path_elements[-1].split('.')[0]
+    
+    if o_fp == None:
+        o_fp = os.path.join(getpd(), 'out', 'rankings', path_elements[-2])
+    
+    os.makedirs(o_fp, exist_ok=True)
+    
+    cen_lines, con_line_blocks, _ = load_data(d_fn)
+    sos = con_line_blocks[0][0]
+    eos = con_line_blocks[0][-1]
+    
+    with tf.distribute.MultiWorkerMirroredStrategy().scope():
+        model = DeepDLTransformer(vocab_size)
+     
+        model([DUMMY_DATA, DUMMY_DATA, DUMMY_DATA], training=False)
+        model.load_weights(w_fn)
+        
+        out = DeepDL(model, sos, eos)([cen_lines, con_line_blocks])
+    
+    with open(os.path.join(o_fp, 'raw_ranking_' + hash + '.txt'),
+              mode='w', newline='') as f:
+        writer = csv.writer(f)
+        
+        writer.writerow(['ID', 'CentralLine', 
+                         'GeneratedLine', 'Entropy'])       
+        writer.writerows(out)
+        
+    
 if __name__ == '__main__':
     main(sys.argv)
 
