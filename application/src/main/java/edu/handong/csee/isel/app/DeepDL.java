@@ -145,8 +145,6 @@ class DeepDL {
         Files.createDirectories(Path.of(dataPath)); 
         Files.createDirectories(Path.of(rankingPath)); 
     
-
-
         if (!Files.exists(Path.of(repoPath))) {
             searcher.cloneRepository(url, repoPath);
         }
