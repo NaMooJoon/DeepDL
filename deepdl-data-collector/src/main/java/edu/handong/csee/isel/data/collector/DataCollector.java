@@ -23,7 +23,6 @@ public class DataCollector {
     private GitHubSearcher searcher = new GitHubSearcher();
     private Extractor extractor = new Extractor(searcher);
     private DatasetMaker maker = new DatasetMaker(searcher);
-    private String projectPath = Utils.getProjectPath();
     
     /**
      * Collects data from the repository of the given url and key for DeepDL model.
@@ -37,18 +36,16 @@ public class DataCollector {
         final float TRAIN_RATIO = 0.6F;
         
         RevCommit splittingCommit;
-        String[] elements = url.split("/");
-        String repouser = elements[elements.length - 2];
-        String repository = elements[elements.length - 1];
+        String[] uriElements = url.split("/");
+        String repouser = uriElements[uriElements.length - 2];
+        String repository = uriElements[uriElements.length - 1];
         String repoPath = String.join(File.separator, 
-                                      projectPath, "out", "snapshot", 
+                                      Utils.projectPath, "out", "snapshot", 
                                       repouser, repository);
 
-        searcher.setRepouser(repouser);
-        searcher.setRepository(repository);
-        Files.createDirectories(Path.of(projectPath, "out", "bfc"));
-        Files.createDirectories(Path.of(projectPath, "out", "bic"));
-        Files.createDirectories(Path.of(projectPath, 
+        Files.createDirectories(Path.of(Utils.projectPath, "out", "bfc"));
+        Files.createDirectories(Path.of(Utils.projectPath, "out", "bic"));
+        Files.createDirectories(Path.of(Utils.projectPath, 
                                         "out", "test-data", 
                                         repouser, repository));
         
@@ -75,39 +72,4 @@ public class DataCollector {
         maker.makeDataset(splittingCommit.getAuthorIdent().getWhen());
         Utils.unpack(Path.of(repoPath), "java");
     }
-
-    /**
-     * Loads resources to the given array.<p>
-     * Index 0: represents urls<p>
-     * Index 1: represents jira keys<p>
-     * Index 2: represents repousers<p>
-     * Index 3: represents repositories<p>
-     * @param resources resource array
-     */
-    /** 
-    private void loadResources(List<String>[] resources) {
-        Path resourcePath = Path.of(projectPath, "src", "main", "resources");
-
-        try {
-            resources[Resources.URL.ordinal()] 
-                    = Files.readAllLines(resourcePath.resolve("url"));
-            resources[Resources.KEY.ordinal()] 
-                    = Files.readAllLines(resourcePath.resolve("jira-key"));
-            
-            for (int i = 2; i <= 3; i++) {
-                resources[i] = new ArrayList<String>();
-            }
-
-            for (String url : resources[Resources.URL.ordinal()]) {
-                String[] splitted = url.split("/");
-                
-                for (int i = 2; i <= 3; i++) {
-                    resources[i].add(splitted[i + 1]);
-                }
-            }
-        } catch(IOException e) {
-            e.printStackTrace();
-        } 
-    }
-    **/
 }

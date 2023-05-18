@@ -57,7 +57,7 @@ public class DatasetMaker {
     public void makeDataset(Date splittingPoint) 
             throws MissingObjectException, IOException, GitAPIException {
         JSONArray ja = new JSONArray(
-                Files.readAllLines(Path.of(Utils.getProjectPath(), 
+                Files.readAllLines(Path.of(Utils.projectPath, 
                                    "out", "bic", 
                                    "bic_" + searcher.getRepository() + ".json"))
                      .get(0));
@@ -109,7 +109,7 @@ public class DatasetMaker {
                     throws FileNotFoundException, IOException { 
         for (String key : buggyLines.keySet()) {
             removeBuggyLines(String.join(File.separator, 
-                                         Utils.getProjectPath(), 
+                                         Utils.projectPath, 
                                          "out", "snapshot", 
                                          searcher.getRepouser(), 
                                          searcher.getRepository(),
@@ -124,7 +124,7 @@ public class DatasetMaker {
      * @param removedLines the removed lines
      * @return records which are classified by files
      */
-    private HashMap<String, ArrayList<ArrayList<Object>>> makeRecords(
+    public HashMap<String, ArrayList<ArrayList<Object>>> makeRecords(
             HashMap<String, ArrayList<String>> addedAndMaintainedLines,
             HashMap<String, ArrayList<String>> removedLines) {        
         HashMap<String, ArrayList<ArrayList<Object>>> records = 
@@ -133,9 +133,7 @@ public class DatasetMaker {
         for (String key : addedAndMaintainedLines.keySet()) {
             ArrayList<String> addedAndMaintainedList = 
                     addedAndMaintainedLines.get(key);
-            ArrayList<String> removedList = removedLines.containsKey(key) 
-                    ? removedLines.get(key) 
-                    : null;
+            ArrayList<String> removedList = removedLines.get(key);
             ArrayList<ArrayList<Object>> recordList = new ArrayList<>();
             
             for (int i = 0; i < addedAndMaintainedList.size(); i++) {
@@ -199,12 +197,12 @@ public class DatasetMaker {
      * @param records records
      * @throws IOException
      */
-    private void saveBICWithPinpointedBuggyLines(String bic,
+    public void saveBICWithPinpointedBuggyLines(String bic,
             HashMap<String, ArrayList<ArrayList<Object>>> records) 
                     throws IOException {
         try (CSVPrinter printer = new CSVPrinter(
                 new FileWriter(new File(String.join(File.separator, 
-                                                    Utils.getProjectPath(), 
+                                                    Utils.projectPath, 
                                                     "out", "test-data", 
                                                     searcher.getRepouser(), 
                                                     searcher.getRepository(),
@@ -359,7 +357,7 @@ public class DatasetMaker {
      * @throws MissingObjectException
      * @throws IOException
      */
-    private HashMap<String, ArrayList<String>> getAddedAndMaintainedLines(
+    public HashMap<String, ArrayList<String>> getAddedAndMaintainedLines(
             String hash, String extension) throws GitAPIException, 
                                                   MissingObjectException, 
                                                   IOException {
@@ -413,7 +411,7 @@ public class DatasetMaker {
                                                 
         System.out.printf("Removing buggy lines from %s\n", filename);
         File file = new File(filename);
-
+        
         if (!file.exists()) {
             System.out.println("File does not exists.");
             return;

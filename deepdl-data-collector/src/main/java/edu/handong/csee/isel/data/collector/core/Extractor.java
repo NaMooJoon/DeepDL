@@ -3,7 +3,6 @@ package edu.handong.csee.isel.data.collector.core;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -22,7 +21,6 @@ public class Extractor {
     private String command;
     private String option;
     private String program;
-    private String projectPath = Utils.getProjectPath();
 
     /**
      * Initializes the command and option for extracting BFC and BIC depends on the OS system.
@@ -73,15 +71,15 @@ public class Extractor {
                                       "-ij", "-jk", key);
         String fileName = String.join(
                 File.separator, 
-                projectPath, "out", "bfc", 
+                Utils.projectPath, "out", "bfc", 
 				"bfc_" + searcher.getRepository() + ".json"); 
         BFCWriter writer = new BFCWriter(fileName);
 	    
-		execute(command, option, argument, projectPath);
+		Utils.execute(command, option, argument, Utils.projectPath);
 	
 		reader = new CommitHashReader(String.join(
                         File.separator, 
-                        projectPath, patchPath, 
+                        Utils.projectPath, patchPath, 
 						"PATCH_" + searcher.getRepository() + ".csv"));
 		
         writer.writeBFC(searcher.getRepouser(), searcher.getRepository(), 
@@ -113,9 +111,9 @@ public class Extractor {
         String argument = String.join(" ", 
                                       "python", mainPath, 
                                       BFCPath, ymlPath, repoPath);
-		String outPath = String.join(File.separator, projectPath, "out");
+		String outPath = String.join(File.separator, Utils.projectPath, "out");
         
-        execute(command, option, argument, projectPath);    
+        Utils.execute(command, option, argument, Utils.projectPath);    
         Files.move(Path.of(outPath, 
                            new File(outPath).list(
                                 new FilenameFilter() {
@@ -128,49 +126,6 @@ public class Extractor {
                                 })[0]),  
 				   Path.of(outPath, 
                           "bic", "bic_" + searcher.getRepository() + ".json"));
-    }
-
-    /**
-     * Executes the given command with the given option and argument in a subprocess.
-     * @param command the command
-     * @param option the option
-     * @param argument the argument
-     * @param dir the directory in which executes the command
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private void execute(String command, String option, String argument, 
-                        String dir) 
-                                throws IOException, InterruptedException {
-        Process child = Runtime.getRuntime()
-                               .exec(new String[] {command, option, argument}, 
-                                     null, 
-                                     new File(dir));
-        
-        flushWaitFor(child);
-    }    
-
-    /**
-     * Flushes the given process' input stream and error stream.<p>
-     * If the process has not yet terminated, the calling thread will be blocked until the process exits.
-     * @param p the process 
-     * @return exit value of the process
-     */
-    private int flushWaitFor(Process p) throws IOException {
-        InputStream is = p.getInputStream();
-        InputStream es = p.getErrorStream();
-        
-        while (p.isAlive()) {
-            if (is.available() > 0) {
-                System.out.print(new String(is.readNBytes(is.available())));
-            }
-
-            if (es.available() > 0) {
-                System.out.print(new String(es.readNBytes(es.available())));
-            }
-        }
-        
-        return p.exitValue();
     }
 }
 

@@ -169,11 +169,15 @@ public class GitHubSearcher implements AutoCloseable {
      * @throws IOException
      */
     public void changeRepository(String gitDir) throws IOException {
+        String[] pathElements = gitDir.split("/");
+
         if (git != null) {
             git.close();
         }
-        
+
         git = Git.open(new File(gitDir));
+        repouser = pathElements[pathElements.length - 3];
+        repository = pathElements[pathElements.length - 2];
     }
 
     @Override
@@ -187,13 +191,5 @@ public class GitHubSearcher implements AutoCloseable {
 
     public String getRepository() {
         return repository;
-    }
-
-    public void setRepouser(String repouser) {
-        this.repouser = repouser;
-    }
-
-    public void setRepository(String repository) {
-        this.repository = repository;
     }
 }
