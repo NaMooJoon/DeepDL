@@ -136,23 +136,29 @@ class DeepDL {
         String shortHash = hash.substring(0, 5);
         String rawDataFilename = "raw_" + shortHash + ".csv";
         String preprocessedDataFilename = "processed_" + shortHash + ".csv";
-        String rawRankingFilename = "raw_ranking_" + shortHash + ".txt";
+        String rawRankingFilename = "raw_ranking_" + shortHash + ".csv";
         String rankingFilename = "ranking_" + shortHash + ".txt";
         GitHubSearcher searcher = new GitHubSearcher();
         DatasetMaker maker = new DatasetMaker(searcher);
         
+        System.out.println("creating output directories...");
         Files.createDirectories(Path.of(dataPath)); 
         Files.createDirectories(Path.of(rankingPath)); 
     
+
+
         if (!Files.exists(Path.of(repoPath))) {
             searcher.cloneRepository(url, repoPath);
         }
         
+        System.out.println("changing repository of GiHubSearcher...");
         searcher.changeRepository(String.join(repoPath, ".git"));
+        System.out.println("making raw commit data...");
         maker.saveBICWithPinpointedBuggyLines(hash, 
                 maker.makeRecords(
                         maker.getAddedAndMaintainedLines(hash, "java"), 
                         new HashMap<>()));
+        System.out.println("executing tokenizer...");
         Utils.execute(command, option, 
                       String.join(" ", 
                                   "python3.8 tokenizer.py",
@@ -163,7 +169,8 @@ class DeepDL {
                       String.join(File.separator, 
                                   Utils.projectPath, 
                                   "..", "deepdl-preprocessor", 
-                                  "src", "main", "resources", "python"));
+                                  "src", "main", "resources", "senetencepiece", "python"));
+        System.out.println("applicating model...");
         Utils.execute(command, option, 
                       String.join(" ", 
                                   "python3.8 main.py 11723 -a",
@@ -175,18 +182,17 @@ class DeepDL {
                       String.join(File.separator, 
                                   Utils.projectPath, 
                                   "..", "deepdl-model", "src"));
-        // execute tokenizer
+        System.out.println("decoding...");
         Utils.execute(command, option, 
                       String.join(" ", 
-                                  "python3.8 main.py 11723 -a",
-                                  weightFilename,  
-                                  dataPath + File.separator 
-                                  + preprocessedDataFilename,
-                                  rankingPath + File.separator 
-                                  + rawRankingFilename),
+                                  "python3.8 decoder.py",
+                                  rawRankingFilename,  
+                                  rankingPath,
+                                  repository),
                       String.join(File.separator, 
                                   Utils.projectPath, 
-                                  "..", "deepdl-model", "src"));
+                                  "..", "deepdl-preprocessor", 
+                                  "src", "main", "resources", "senetencepiece", "python"));
         /** 
         try (BufferedReader reader = new BufferedReader(new FileReader(
                     new File(String.join(File.separator, 

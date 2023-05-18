@@ -2,8 +2,6 @@ package edu.handong.csee.isel.app;
 
 import org.apache.commons.cli.Options;
 
-
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
